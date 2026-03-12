@@ -1,0 +1,58 @@
+   0.068831400s  INFO prepare_target{force=false package_id=forge v0.1.0 (D:\FORGE) target="forge"}: cargo::core::compiler::fingerprint: fingerprint error for forge v0.1.0 (D:\FORGE)/Check { test: false }/TargetInner { name: "forge", doc: true, ..: with_path("D:\\FORGE\\src\\main.rs", Edition2024) }
+   0.068878200s  INFO prepare_target{force=false package_id=forge v0.1.0 (D:\FORGE) target="forge"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\FORGE\target\debug\.fingerprint\forge-1ee2f74170da269e\bin-forge`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+   0.090481700s  INFO prepare_target{force=false package_id=forge v0.1.0 (D:\FORGE) target="forge"}: cargo::core::compiler::fingerprint: fingerprint error for forge v0.1.0 (D:\FORGE)/Check { test: true }/TargetInner { name: "forge", doc: true, ..: with_path("D:\\FORGE\\src\\main.rs", Edition2024) }
+   0.090505200s  INFO prepare_target{force=false package_id=forge v0.1.0 (D:\FORGE) target="forge"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\FORGE\target\debug\.fingerprint\forge-1a3025270597ba8a\test-bin-forge`
+
+Caused by:
+    The system cannot find the file specified. (os error 2)
+
+Stack backtrace:
+   0: git_midx_writer_dump
+   1: git_midx_writer_dump
+   2: git_midx_writer_dump
+   3: git_midx_writer_dump
+   4: git_filter_source_repo
+   5: git_filter_source_repo
+   6: git_filter_source_repo
+   7: git_filter_source_repo
+   8: git_filter_source_repo
+   9: git_filter_source_repo
+  10: git_filter_source_repo
+  11: git_libgit2_prerelease
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: git_midx_writer_dump
+  17: git_filter_source_repo
+  18: git_midx_writer_dump
+  19: BaseThreadInitThunk
+  20: RtlUserThreadStart
+    Checking forge v0.1.0 (D:\FORGE)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.52s
