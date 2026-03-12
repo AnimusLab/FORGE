@@ -1,4 +1,4 @@
-# 🔨 FORGE
+# FORGE
 ### File-Oriented Rust Grade Engine
 
 FORGE is a high-performance Rust engine that turns free cloud storage (Google Drive, MEGA, pCloud) into a fully queryable database. Bring your own storage. Own your data. Pay nothing.
