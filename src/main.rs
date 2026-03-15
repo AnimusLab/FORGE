@@ -1,5 +1,6 @@
 mod api;
 mod auth;
+mod engine;
 mod format;
 mod state;
 
@@ -24,7 +25,9 @@ async fn main() {
     let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_string());
     let addr: SocketAddr = format!("0.0.0.0:{}", port).parse().unwrap();
 
-    let state = Arc::new(RwLock::new(AppState::new()));
+    let mut app_state = AppState::new();
+    app_state.replay_wal();
+    let state = Arc::new(RwLock::new(app_state));
 
     let app = Router::new()
         .merge(api::public_routes())
