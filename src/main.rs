@@ -1,8 +1,10 @@
 mod api;
 mod auth;
+mod config;
 mod engine;
 mod format;
 mod state;
+mod storage;
 
 use axum::{middleware, Router};
 use std::{net::SocketAddr, sync::Arc};
@@ -20,6 +22,23 @@ async fn main() {
 
     if std::env::var("FORGE_API_KEY").is_err() {
         panic!("[FORGE] FORGE_API_KEY is not set. Refusing to start.");
+    }
+
+    let forge_config = match config::load("forge.toml") {
+        Ok(c) => {
+            info!("[CONFIG] forge.toml loaded successfully");
+            c
+        }
+        Err(e) => panic!("{}", e),
+    };
+
+    match &forge_config.storage {
+        config::StorageConfig::Http(h) => {
+            info!("[CONFIG] Storage backend: HTTP → {}", h.base_url);
+        }
+        config::StorageConfig::S3(s) => {
+            info!("[CONFIG] Storage backend: S3 → {}", s.endpoint);
+        }
     }
 
     let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_string());

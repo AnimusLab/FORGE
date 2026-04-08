@@ -1,3 +1,7 @@
 target/
 .env
 *.forge
+forge.toml
+forge.wal
+forge.toml
+forge.wal

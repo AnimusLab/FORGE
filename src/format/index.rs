@@ -1,4 +1,4 @@
-pub const ID_SIZE: usize = 36; // UUID v4 string is always 36 chars
+pub const ID_SIZE: usize = 36;
 
 #[derive(Debug, Clone)]
 pub struct IndexEntry {
@@ -53,9 +53,7 @@ impl ForgeIndex {
     }
 
     pub fn from_bytes(buf: &[u8]) -> Result<(Self, usize), String> {
-        if buf.len() < 8 {
-            return Err("Index buffer too small".to_string());
-        }
+        if buf.len() < 8 { return Err("Index buffer too small".to_string()); }
         let count = u64::from_le_bytes(buf[0..8].try_into().unwrap()) as usize;
         let mut pos = 8;
         let entry_size = ID_SIZE + 8 + 8 + 1;
@@ -65,19 +63,17 @@ impl ForgeIndex {
             if pos + entry_size > buf.len() {
                 return Err("Unexpected end of index buffer".to_string());
             }
-            let id = String::from_utf8(buf[pos..pos + ID_SIZE].to_vec())
+            let id = String::from_utf8(buf[pos..pos+ID_SIZE].to_vec())
                 .map_err(|e| e.to_string())?
                 .trim_end_matches('\0')
                 .to_string();
             pos += ID_SIZE;
-
-            let offset = u64::from_le_bytes(buf[pos..pos + 8].try_into().unwrap());
+            let offset = u64::from_le_bytes(buf[pos..pos+8].try_into().unwrap());
             pos += 8;
-            let length = u64::from_le_bytes(buf[pos..pos + 8].try_into().unwrap());
+            let length = u64::from_le_bytes(buf[pos..pos+8].try_into().unwrap());
             pos += 8;
             let deleted = buf[pos] != 0;
             pos += 1;
-
             entries.push(IndexEntry { id, offset, length, deleted });
         }
 

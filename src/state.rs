@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 use crate::engine::idempotency::IdempotencyStore;
-use crate::engine::wal::{Wal, WalEntry, WalOp};
+use crate::engine::wal::{Wal, WalOp};
 use crate::format::ForgeFile;
-use serde_json::Value;
 
 pub struct AppState {
     pub collections: HashMap<String, ForgeFile>,
@@ -44,10 +43,7 @@ impl AppState {
                                 .entry(entry.collection.clone())
                                 .or_insert_with(ForgeFile::new);
                             match file.insert(entry.record_id.clone(), obj) {
-                                Ok(_) => {
-                                    let _ = self.wal.mark_committed(&entry.entry_id);
-                                    tracing::info!("[WAL] Replayed INSERT id='{}'", entry.record_id);
-                                }
+                                Ok(_) => { let _ = self.wal.mark_committed(&entry.entry_id); }
                                 Err(e) => tracing::warn!("[WAL] Replay INSERT failed: {}", e),
                             }
                         }
@@ -58,10 +54,7 @@ impl AppState {
                         if let Some(obj) = data.as_object() {
                             if let Some(file) = self.collections.get_mut(&entry.collection) {
                                 match file.update(&entry.record_id, obj) {
-                                    Ok(_) => {
-                                        let _ = self.wal.mark_committed(&entry.entry_id);
-                                        tracing::info!("[WAL] Replayed UPDATE id='{}'", entry.record_id);
-                                    }
+                                    Ok(_) => { let _ = self.wal.mark_committed(&entry.entry_id); }
                                     Err(e) => tracing::warn!("[WAL] Replay UPDATE failed: {}", e),
                                 }
                             }
@@ -72,7 +65,6 @@ impl AppState {
                     if let Some(file) = self.collections.get_mut(&entry.collection) {
                         file.delete(&entry.record_id);
                         let _ = self.wal.mark_committed(&entry.entry_id);
-                        tracing::info!("[WAL] Replayed DELETE id='{}'", entry.record_id);
                     }
                 }
             }
@@ -80,9 +72,7 @@ impl AppState {
     }
 
     pub fn get_or_create(&mut self, name: &str) -> &mut ForgeFile {
-        self.collections
-            .entry(name.to_string())
-            .or_insert_with(ForgeFile::new)
+        self.collections.entry(name.to_string()).or_insert_with(ForgeFile::new)
     }
 
     pub fn get(&self, name: &str) -> Option<&ForgeFile> {

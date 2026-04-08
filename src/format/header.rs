@@ -18,12 +18,7 @@ impl ForgeHeader {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs() as i64;
-        Self {
-            version: VERSION,
-            created_at: now,
-            row_count: 0,
-            schema_hash: 0,
-        }
+        Self { version: VERSION, created_at: now, row_count: 0, schema_hash: 0 }
     }
 
     pub fn to_bytes(&self) -> [u8; HEADER_SIZE] {
@@ -33,7 +28,6 @@ impl ForgeHeader {
         buf[9..17].copy_from_slice(&self.created_at.to_le_bytes());
         buf[17..25].copy_from_slice(&self.row_count.to_le_bytes());
         buf[25..33].copy_from_slice(&self.schema_hash.to_le_bytes());
-        // bytes 33..64 reserved for future use
         buf
     }
 
