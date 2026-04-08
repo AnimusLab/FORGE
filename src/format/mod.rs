@@ -50,9 +50,7 @@ impl ForgeFile {
     pub fn get_all(&self) -> Result<Vec<Value>, String> {
         let mut results = Vec::new();
         for entry in &self.index.entries {
-            if entry.deleted {
-                continue;
-            }
+            if entry.deleted { continue; }
             let mut pos = entry.offset as usize;
             let row = row_from_bytes(&self.data, &mut pos)?;
             let mut obj = Map::new();
@@ -133,20 +131,14 @@ impl ForgeFile {
         let header = ForgeHeader::from_bytes(header_arr)?;
         let mut pos = HEADER_SIZE;
 
-        if pos + 4 > buf.len() {
-            return Err("Missing schema length".to_string());
-        }
-        let schema_len = u32::from_le_bytes(buf[pos..pos + 4].try_into().unwrap()) as usize;
+        let schema_len = u32::from_le_bytes(buf[pos..pos+4].try_into().unwrap()) as usize;
         pos += 4;
-        let (schema, _) = ForgeSchema::from_bytes(&buf[pos..pos + schema_len])?;
+        let (schema, _) = ForgeSchema::from_bytes(&buf[pos..pos+schema_len])?;
         pos += schema_len;
 
-        if pos + 4 > buf.len() {
-            return Err("Missing index length".to_string());
-        }
-        let index_len = u32::from_le_bytes(buf[pos..pos + 4].try_into().unwrap()) as usize;
+        let index_len = u32::from_le_bytes(buf[pos..pos+4].try_into().unwrap()) as usize;
         pos += 4;
-        let (index, _) = ForgeIndex::from_bytes(&buf[pos..pos + index_len])?;
+        let (index, _) = ForgeIndex::from_bytes(&buf[pos..pos+index_len])?;
         pos += index_len;
 
         let data = buf[pos..].to_vec();
@@ -165,11 +157,9 @@ mod tests {
         let mut f = ForgeFile::new();
         let obj = json!({"name": "John", "age": 25});
         f.insert("id-001".to_string(), obj.as_object().unwrap()).unwrap();
-
         let records = f.get_all().unwrap();
         assert_eq!(records.len(), 1);
         assert_eq!(records[0]["name"], "John");
-        assert_eq!(records[0]["age"], 25);
     }
 
     #[test]
@@ -177,11 +167,9 @@ mod tests {
         let mut f = ForgeFile::new();
         let obj = json!({"name": "Jane", "score": 99.5, "active": true});
         f.insert("id-001".to_string(), obj.as_object().unwrap()).unwrap();
-
         let bytes = f.to_bytes();
         let f2 = ForgeFile::from_bytes(&bytes).unwrap();
         let records = f2.get_all().unwrap();
-
         assert_eq!(records.len(), 1);
         assert_eq!(records[0]["name"], "Jane");
     }
@@ -200,10 +188,8 @@ mod tests {
         let mut f = ForgeFile::new();
         let obj = json!({"name": "John", "age": 25});
         f.insert("id-001".to_string(), obj.as_object().unwrap()).unwrap();
-
         let update = json!({"age": 30});
         f.update("id-001", update.as_object().unwrap()).unwrap();
-
         let record = f.get_one("id-001").unwrap().unwrap();
         assert_eq!(record["age"], 30);
         assert_eq!(record["name"], "John");

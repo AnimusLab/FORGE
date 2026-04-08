@@ -9,7 +9,6 @@ impl IdempotencyStore {
         Self { seen: HashSet::new() }
     }
 
-    // Returns true if new request, false if duplicate
     pub fn check_and_insert(&mut self, request_id: &str) -> bool {
         if self.seen.contains(request_id) {
             false

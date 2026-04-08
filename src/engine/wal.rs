@@ -40,15 +40,7 @@ impl WalEntry {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs() as i64;
-        Self {
-            entry_id,
-            op,
-            collection,
-            record_id,
-            data,
-            status: WalStatus::Pending,
-            timestamp,
-        }
+        Self { entry_id, op, collection, record_id, data, status: WalStatus::Pending, timestamp }
     }
 }
 
@@ -63,11 +55,8 @@ impl Wal {
 
     pub fn append(&self, entry: &WalEntry) -> Result<(), String> {
         let mut file = OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&self.path)
+            .create(true).append(true).open(&self.path)
             .map_err(|e| e.to_string())?;
-
         let json = serde_json::to_vec(entry).map_err(|e| e.to_string())?;
         let len = json.len() as u32;
         file.write_all(&len.to_le_bytes()).map_err(|e| e.to_string())?;
@@ -80,7 +69,6 @@ impl Wal {
             Ok(f) => f,
             Err(_) => return Ok(vec![]),
         };
-
         let mut entries = Vec::new();
         loop {
             let mut len_buf = [0u8; 4];
@@ -108,20 +96,13 @@ impl Wal {
     }
 
     pub fn pending_entries(&self) -> Result<Vec<WalEntry>, String> {
-        Ok(self.read_all()?
-            .into_iter()
-            .filter(|e| e.status == WalStatus::Pending)
-            .collect())
+        Ok(self.read_all()?.into_iter().filter(|e| e.status == WalStatus::Pending).collect())
     }
 
     fn rewrite(&self, entries: &[WalEntry]) -> Result<(), String> {
         let mut file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .open(&self.path)
+            .create(true).write(true).truncate(true).open(&self.path)
             .map_err(|e| e.to_string())?;
-
         for entry in entries {
             let json = serde_json::to_vec(entry).map_err(|e| e.to_string())?;
             let len = json.len() as u32;

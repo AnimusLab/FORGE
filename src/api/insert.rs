@@ -21,7 +21,6 @@ pub async fn handle(
         );
     }
 
-    // Idempotency check
     let request_id = headers
         .get("X-Forge-Request-Id")
         .and_then(|v| v.to_str().ok())
@@ -45,7 +44,6 @@ pub async fn handle(
     let id = Uuid::new_v4().to_string();
     let obj = body.as_object().unwrap();
 
-    // Write WAL entry before executing
     let wal_entry = WalEntry::new(
         Uuid::new_v4().to_string(),
         WalOp::Insert,
@@ -61,7 +59,6 @@ pub async fn handle(
         );
     }
 
-    // Execute insert
     let file = st.get_or_create(&collection);
     match file.insert(id.clone(), obj) {
         Ok(_) => {
