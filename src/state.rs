@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use crate::config::{ForgeConfig, StorageConfig};
+use crate::storage::StorageBackend;
+use crate::storage::http::HttpStorageAdapter;
 use crate::engine::idempotency::IdempotencyStore;
 use crate::engine::wal::{Wal, WalOp};
 use crate::format::ForgeFile;
@@ -8,6 +10,7 @@ pub struct AppState {
     pub collections: HashMap<String, ForgeFile>,
     pub wal: Wal,
     pub idempotency: IdempotencyStore,
+    pub storage: Box<dyn StorageBackend>,
     pub forge_config: ForgeConfigState,
 }
 
@@ -17,10 +20,22 @@ pub struct ForgeConfigState {
 
 impl AppState {
     pub fn new(config: ForgeConfig) -> Self {
+        // Based on the tagged enum, we initialize the correct adapter
+        let storage: Box<dyn StorageBackend> = match config.storage.clone() {
+            StorageConfig::Http(http_cfg) => {
+                tracing::info!("[STATE] Initializing HttpStorageAdapter");
+                Box::new(HttpStorageAdapter::new(http_cfg))
+            },
+            StorageConfig::S3(_s3_cfg) => {
+                panic!("[STATE] S3 Adapter not implemented yet!");
+            }
+        };
+
         Self {
             collections: HashMap::new(),
             wal: Wal::new("forge.wal"),
             idempotency: IdempotencyStore::new(),
+            storage,
             forge_config: ForgeConfigState {
                 storage: Some(config.storage),
             },

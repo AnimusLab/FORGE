@@ -182,7 +182,7 @@ fn parse_url(url: &str) -> Result<(String, String), String> {
 }
 
 // Native TLS handshake over TCP stream
-async fn native_tls_connect(
+pub async fn native_tls_connect(
     stream: TcpStream,
     host: &str,
 ) -> Result<tokio_native_tls::TlsStream<TcpStream>, String> {

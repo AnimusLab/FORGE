@@ -1,12 +1,12 @@
 use serde::Deserialize;
 use std::fs;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct ForgeConfig {
     pub storage: StorageConfig,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 #[serde(tag = "type")]
 pub enum StorageConfig {
     #[serde(rename = "http")]
@@ -16,7 +16,7 @@ pub enum StorageConfig {
     S3(S3StorageConfig),
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct HttpStorageConfig {
     pub base_url: String,
     pub auth_type: String,
@@ -25,7 +25,7 @@ pub struct HttpStorageConfig {
     pub oauth2: Option<OAuthConfig>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct OAuthConfig {
     pub client_id: String,
     pub client_secret: String,
@@ -33,7 +33,7 @@ pub struct OAuthConfig {
     pub token_url: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct S3StorageConfig {
     pub endpoint: String,
     pub bucket: String,
