@@ -20,6 +20,8 @@ pub enum StorageConfig {
 pub struct HttpStorageConfig {
     pub base_url: String,
     pub auth_type: String,
+    pub redirect_uri: String,
+    pub auth_url: String,
     pub oauth2: Option<OAuthConfig>,
 }
 

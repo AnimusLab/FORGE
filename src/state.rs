@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use crate::config::{ForgeConfig, StorageConfig};
 use crate::engine::idempotency::IdempotencyStore;
 use crate::engine::wal::{Wal, WalOp};
 use crate::format::ForgeFile;
@@ -7,14 +8,22 @@ pub struct AppState {
     pub collections: HashMap<String, ForgeFile>,
     pub wal: Wal,
     pub idempotency: IdempotencyStore,
+    pub forge_config: ForgeConfigState,
+}
+
+pub struct ForgeConfigState {
+    pub storage: Option<StorageConfig>,
 }
 
 impl AppState {
-    pub fn new() -> Self {
+    pub fn new(config: ForgeConfig) -> Self {
         Self {
             collections: HashMap::new(),
             wal: Wal::new("forge.wal"),
             idempotency: IdempotencyStore::new(),
+            forge_config: ForgeConfigState {
+                storage: Some(config.storage),
+            },
         }
     }
 

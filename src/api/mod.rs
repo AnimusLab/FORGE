@@ -1,3 +1,4 @@
+pub mod auth;
 pub mod delete;
 pub mod health;
 pub mod insert;
@@ -6,7 +7,7 @@ pub mod query_one;
 pub mod update;
 
 use axum::{
-    routing::{delete, get, patch, post},
+    routing::{get, post},
     Router,
 };
 use std::sync::Arc;
@@ -15,9 +16,12 @@ use crate::state::AppState;
 
 pub type SharedState = Arc<RwLock<AppState>>;
 
-pub fn public_routes() -> Router {
+pub fn public_routes(state: SharedState) -> Router {
     Router::new()
         .route("/v1/health", get(health::handle))
+        .route("/v1/auth/login", get(auth::login))
+        .route("/v1/auth/callback", get(auth::callback))
+        .with_state(state)
 }
 
 pub fn protected_routes(state: SharedState) -> Router {

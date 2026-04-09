@@ -44,12 +44,12 @@ async fn main() {
     let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_string());
     let addr: SocketAddr = format!("0.0.0.0:{}", port).parse().unwrap();
 
-    let mut app_state = AppState::new();
+    let mut app_state = AppState::new(forge_config);
     app_state.replay_wal();
     let state = Arc::new(RwLock::new(app_state));
 
     let app = Router::new()
-        .merge(api::public_routes())
+        .merge(api::public_routes(state.clone()))
         .merge(
             api::protected_routes(state.clone())
                 .layer(middleware::from_fn(auth::apikey::auth_middleware)),
