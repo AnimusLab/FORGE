@@ -1,0 +1,318 @@
+type: framework
+namespace: EU
+version: "2024/1689"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+opt_in: true
+source: "EU Artificial Intelligence Act (Regulation EU 2024/1689)"
+source_url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+source_date: "August 1, 2024"
+credit: >
+  Regulation (EU) 2024/1689 of the European Parliament and of the
+  Council laying down harmonised rules on artificial intelligence.
+  Published in the Official Journal of the European Union, L series,
+  2024. Full enforcement of high-risk AI provisions begins August 2,
+  2026. Credit scoring, AML monitoring, and fraud detection are
+  legally classified as high-risk AI systems under Annex III.
+layer_2_status: >
+  Rules marked obligation_type: provenance or audit depend on
+  AnchorRuntime (Layer 2) and the Decision Audit Chain (DAC).
+  Layer 2 is currently in development. These rules are specified
+  as designed and will be enforced once Layer 2 ships.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "EU-ART09"
+    name: "Risk Management System — Continuous Lifecycle"
+    original_id: "Article 9"
+    maps_to: "LEG-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      constitution.anchor sealed ruleset constitutes the documented
+      risk management system. anchor check in CI/CD provides the
+      continuous testing requirement. Violation report is the
+      documented evidence of risk management activity.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      A documented, ongoing risk management system must be established,
+      implemented, and maintained across the entire AI lifecycle for
+      all high-risk AI systems. The system must identify known and
+      foreseeable risks, estimate and evaluate risks, adopt risk
+      management measures, and test the system before market placement
+      and throughout development. This is not a one-time process —
+      it must be updated continuously. Anchor's sealed constitution
+      and CI/CD integration satisfy the technical continuous testing
+      requirement. Fines up to €30 million or 6% of global annual
+      revenue for non-compliance after August 2, 2026.
+    primitives:
+      action: maintain
+      object: risk_management_system
+      context: full_lifecycle
+      authority: regulatory_compliance_service
+      flow: continuous_testing_flow
+
+  - id: "EU-ART10"
+    name: "Data and Data Governance"
+    original_id: "Article 10"
+    maps_to: "ETH-001"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-001 bias detection active in Layer 1. PRV-002 vector
+      inversion detection covers embedding data governance.
+      PROV-003 provenance violation fires on missing data lineage.
+      DATA-* violation category covers data governance gaps.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      Training, validation, and testing datasets for high-risk AI
+      systems must be subject to appropriate data governance practices.
+      Data must be relevant, representative, and free from errors.
+      Bias detection and mitigation is required. Data residency and
+      provenance must be documented. For financial AI, this means
+      every dataset used in credit scoring, AML, or fraud detection
+      must have documented provenance, bias testing results, and
+      residency records available for conformity assessment.
+    primitives:
+      action: ensure
+      object: data_representative_quality
+      context: bias_mitigation_context
+      authority: data_governance_framework
+      flow: training_data_lineage
+
+  - id: "EU-ART11"
+    name: "Technical Documentation — Before Market Placement"
+    original_id: "Article 11"
+    maps_to: "LEG-002"
+    obligation_type: disclosure
+    anchor_mechanism: >
+      Violation taxonomy + constitution.anchor + mitigation.anchor
+      together constitute the technical documentation layer.
+      anchor audit --report generates the structured documentation
+      artifact for conformity assessment submission.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      Technical documentation must be drawn up before the AI system
+      is placed on the market or put into service. Must include:
+      general description of the system, system components,
+      development process, training methodology, validation results,
+      capabilities and limitations, and risk mitigation measures
+      adopted. Anchor's audit report, sealed constitution, and
+      violation taxonomy together constitute the technical
+      documentation that feeds the EU conformity assessment process.
+    primitives:
+      action: generate
+      object: conformity_assessment_package
+      context: market_placement_gate
+      authority: product_provider
+      flow: technical_documentation_flow
+
+  - id: "EU-ART12"
+    name: "Record-Keeping — Auto-Generated Tamper-Evident Logs"
+    original_id: "Article 12"
+    maps_to: "DAC-AuditEntry"
+    obligation_type: provenance
+    anchor_mechanism: >
+      DAC AuditEntry chain satisfies all Article 12 requirements.
+      entry_id = unique record identifier. chain_hash = tamper
+      evidence. signature = per-entry integrity seal. timestamp =
+      retention timestamp. model_id + model_version = system
+      identification. eu_article12_record() method serializes
+      to EU AI Act compliant log format. Layer 2 in development.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      High-risk AI systems must automatically generate logs enabling
+      post-hoc review of the system's operation. Logs must be retained
+      for a period defined by the deploying operator or relevant
+      sectoral authority — minimum 6 months for most financial AI
+      applications. Logs must be tamper-evident and enable
+      reconstruction of the circumstances around events of concern.
+      This is the most technically specific Article in the EU AI Act
+      and the one most directly satisfied by Anchor's Decision Audit
+      Chain architecture.
+    primitives:
+      action: generate
+      object: tamper_evident_logs
+      context: automatic_log_retention
+      authority: decision_audit_chain
+      flow: audit_entry_persistence
+
+  - id: "EU-ART13"
+    name: "Transparency — Information to Deployers"
+    original_id: "Article 13"
+    maps_to: "ETH-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-002 explainability absence fires on black-box model
+      usage without explain() hooks. adverse_action_reasons()
+      provides CFPB and EU compliant reason codes. TRANS-*
+      violation category covers transparency gaps. model_version
+      in AuditEntry satisfies system identification requirement.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      High-risk AI systems must be designed to be sufficiently
+      transparent that deployers can understand the system's
+      capabilities, limitations, and intended purpose. Instructions
+      for use must include: identity of the provider, capabilities
+      and performance limitations, accuracy metrics, human oversight
+      measures, and technical measures for human control. In financial
+      AI, this means every AI-assisted decision output must include
+      enough information for the deploying institution — and
+      ultimately the affected individual — to understand why the
+      decision was made.
+    primitives:
+      action: provide
+      object: operational_transparency
+      context: high_risk_deployment
+      authority: provider
+      flow: usage_instructions
+
+  - id: "EU-ART14"
+    name: "Human Oversight — Intervention and Override"
+    original_id: "Article 14"
+    maps_to: "ETH-003"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-003 human oversight removal fires when autonomous
+      decision code has no human review checkpoint. AnchorRuntime
+      compliant flag per AuditEntry records whether human oversight
+      was maintained for each decision. Layer 2 in development
+      for runtime enforcement.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      High-risk AI systems must be designed to allow effective human
+      oversight. Deployers must be able to monitor the system's
+      operation, detect and address malfunctions, and interrupt,
+      disregard, or override the system's outputs when necessary.
+      Human oversight must be effective — not nominal. A human
+      reviewer who is presented with AI outputs too quickly, without
+      adequate context, or under time pressure that makes genuine
+      review impossible does not satisfy Article 14. The oversight
+      mechanism must be designed to be practically effective.
+    primitives:
+      action: allow
+      object: human_intervention
+      context: effective_oversight_control
+      authority: human_reviewer
+      flow: oversight_override_flow
+
+  - id: "EU-ART15"
+    name: "Accuracy, Robustness and Cybersecurity"
+    original_id: "Article 15"
+    maps_to: "SEC-001"
+    obligation_type: detection
+    anchor_mechanism: >
+      SEC-001 prompt injection, SEC-002 data poisoning, SEC-003
+      model tampering, SEC-008 supply chain attack, AGT-001 through
+      AGT-005 agentic security rules all fire in Layer 1. Diamond
+      Cage WASM sandbox provides runtime robustness for high-risk
+      operations.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      High-risk AI systems must achieve appropriate levels of accuracy,
+      robustness, and cybersecurity for their intended purpose.
+      They must be resilient against errors, faults, and adversarial
+      attacks — including prompt injection, data poisoning, and model
+      evasion attempts. Security measures must be commensurate with
+      the risk profile of the specific AI system and its deployment
+      context. Anchor's SEC- and AGT- domain rules provide the
+      technical detection layer for every adversarial attack category
+      enumerated in Article 15.
+    primitives:
+      action: achieve
+      object: system_robustness
+      context: adversarial_attack_resilience
+      authority: security_orchestration
+      flow: cybersecurity_protection
+
+  - id: "EU-ART16"
+    name: "Provider Obligations — Complete List"
+    original_id: "Article 16"
+    maps_to: "LEG-002"
+    obligation_type: disclosure
+    anchor_mechanism: >
+      Sealed constitution.anchor + full DAC audit chain together
+      constitute the conformity evidence package. anchor audit
+      --report generates the structured disclosure artifact for
+      EU database registration and supervisory authority submission.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      Providers of high-risk AI systems must: ensure compliance with
+      all technical requirements, draw up technical documentation,
+      operate a quality management system, keep technical documentation
+      and logs for the required retention period, conduct conformity
+      assessment, register in the EU AI database before market
+      placement, affix CE marking where required, appoint an
+      authorised representative in the EU where applicable, and
+      cooperate with national competent authorities on request.
+    primitives:
+      action: conduct
+      object: conformity_assessment
+      context: EU_database_registration
+      authority: authorized_provider
+      flow: compliance_evidence_flow
+
+  - id: "EU-ART26"
+    name: "Deployer Obligations — Monitoring and Oversight"
+    original_id: "Article 26"
+    maps_to: "ETH-003"
+    obligation_type: audit
+    anchor_mechanism: >
+      AnchorRuntime continuous eval satisfies continuous monitoring
+      requirement. Real-time violation detection per AuditEntry.
+      compliant boolean per decision records governance status.
+      Layer 2 in development.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      Deployers of high-risk AI systems must implement appropriate
+      human oversight measures, monitor the system for anomalous
+      behavior, suspend use when serious risk is identified, inform
+      the provider of serious incidents, and keep logs generated
+      by the AI system for the required retention period. Deployers
+      must also conduct data protection impact assessments where
+      the system processes personal data. The deployer bears
+      regulatory liability for every decision the system makes
+      in their deployment context.
+    primitives:
+      action: monitor
+      object: system_anomalies
+      context: operational_oversight
+      authority: deploying_institution
+      flow: incident_notification_flow
+
+  - id: "EU-ART99"
+    name: "Penalties — No Safe Harbour After August 2026"
+    original_id: "Article 99"
+    maps_to: "LEG-002"
+    obligation_type: disclosure
+    anchor_mechanism: >
+      Full Anchor compliance stack — sealed constitution, active
+      domain rules, DAC audit chain, anchor audit --report — is
+      the compliance evidence package that demonstrates conformity
+      and mitigates penalty exposure.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      Violations of requirements for high-risk AI systems carry
+      fines of up to €30 million or 6% of total worldwide annual
+      turnover, whichever is higher. Violations of Article 5
+      prohibited practices carry up to €35 million or 7%.
+      There is no grace period after August 2, 2026. Supervisory
+      authorities in each EU member state are empowered to conduct
+      inspections, demand documentation, and impose fines without
+      prior warning. The only defense is documented, demonstrable
+      compliance — not intent to comply.
+    primitives:
+      action: mitigate
+      object: penalty_exposure
+      context: non_compliance_liability
+      authority: supervising_authority
+      flow: compliance_attestation_flow

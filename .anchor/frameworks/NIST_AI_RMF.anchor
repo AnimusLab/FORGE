@@ -1,0 +1,66 @@
+type: framework
+namespace: NIST
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+source: "NIST AI Risk Management Framework (AI RMF 1.0)"
+source_url: "https://www.nist.gov/itl/ai-rmf"
+credit: "National Institute of Standards and Technology (NIST)"
+description: >
+  The NIST AI RMF provides a high-level framework for managing
+  risks associated with AI systems. Unlike risk taxonomies,
+  NIST RMF defines governance functions—Govern, Map, Measure,
+  Manage. This framework file maps these functions to Anchor's
+  operational primitives and enforcement mechanisms.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "NIST-GOV"
+    name: "GOVERN: Institutional Policies"
+    original_id: "Govern 1.1"
+    maps_to: "LEG-002"
+    severity: "error"
+    obligation_type: "audit"
+    anchor_mechanism: "policy.anchor + sealed manifest"
+    description: >
+      Policies, processes, and procedures for AI risk management are
+      established and maintained. Anchor satisfy this by enforcing
+      a cryptographically sealed constitution and project-level
+      policy.anchor overrides.
+
+  - id: "NIST-MAP"
+    name: "MAP: Risk Identification"
+    original_id: "Map 1.1"
+    maps_to: "SHR-001"
+    severity: "warning"
+    obligation_type: "audit"
+    anchor_mechanism: "anchor check --report-server"
+    description: >
+      Context is established and risks are identified and documented.
+      Anchor's federated domains (SEC, ETH, PRV, etc.) provide the
+      contextual mapping of technical risks to organizational impact.
+
+  - id: "NIST-MEAS"
+    name: "MEASURE: Risk Assessment"
+    original_id: "Measure 2.1"
+    maps_to: "OPS-001"
+    severity: "warning"
+    obligation_type: "provenance"
+    anchor_mechanism: "telemetry_path: .anchor/telemetry/"
+    description: >
+      AI systems are assessed for risks and impacts. Anchor's
+      telemetry output provides the metrics for assessing frequency
+      and severity of compliance violations across the fleet.
+
+  - id: "NIST-MAN"
+    name: "MANAGE: Risk Treatment"
+    original_id: "Manage 1.1"
+    maps_to: "ALN-002"
+    severity: "blocker"
+    obligation_type: "audit"
+    anchor_mechanism: "anchor check --severity error (CI Gate)"
+    description: >
+      Risks are prioritized and managed based on impact and likelihood.
+      Anchor's CI/CD integration (pre-commit hooks, GH Actions) acts
+      as the primary "Manage" gate, blocking non-compliant code from deployment.

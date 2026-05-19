@@ -1,0 +1,144 @@
+type: domain
+namespace: ETH
+version: "2.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+always_loaded: true
+description: >
+  Ethics violations in AI systems. Covers bias and discrimination,
+  explainability absence, human oversight removal, and toxic output.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "ETH-001"
+    name: "Bias and Discrimination"
+    source: "FINOS"
+    original_id: "Ri-009"
+    category: "fairness"
+    description: >
+      AI models produce systematically biased or discriminatory outcomes
+      by using prohibited proxy attributes in decisions.
+    severity: "blocker"
+    min_severity: "blocker"
+    maps_to: ["RBI-019", "ECOA", "FHA-805"]
+    min_mitigations: 1
+    detection: "aho_corasick"
+    prohibited_proxies:
+      - concept: "Redlining"
+        canonical: "geographic_discrimination"
+        surface_terms:
+          - "zip code"
+          - "neighborhood"
+          - "location-based risk"
+          - "urban density"
+          - "community profile"
+          - "school district"
+          - "property value"
+        synonym_coverage: partial
+        rationale: "FHA Sec 805 / ECOA Sec 701(a)"
+
+      - concept: "Gender Bias"
+        canonical: "gender_discrimination"
+        surface_terms:
+          - "maternity"
+          - "marital status"
+          - "familial obligations"
+          - "pregnancy"
+          - "spouse income"
+          - "paternity"
+        synonym_coverage: partial
+        rationale: "ECOA Sec 701(a)"
+
+      - concept: "Age Discrimination"
+        canonical: "age_discrimination"
+        surface_terms:
+          - "retirement age"
+          - "years to retirement"
+          - "older applicant"
+          - "near retirement"
+        synonym_coverage: partial
+        rationale: "ECOA / ADEA"
+
+      - concept: "Racial Proxy"
+        canonical: "racial_discrimination"
+        surface_terms:
+          - "ethnic background"
+          - "country of origin"
+          - "native language"
+          - "cultural community"
+          - "national origin"
+        synonym_coverage: partial
+        rationale: "ECOA / FHA Sec 804"
+
+    primitives:
+      action: discriminate
+      object: decision_outcomes
+      context: prohibited_proxies
+      authority: predictive_model
+      flow: biased_inference
+
+  - id: "ETH-002"
+    name: "Explainability Absence"
+    source: "FINOS"
+    original_id: "Ri-010"
+    category: "transparency"
+    description: >
+      AI systems make decisions without structured, machine-readable
+      explanations. In structured mode, JSON output with ReasonCode
+      and FeatureAttribution fields is mandatory.
+    severity: "blocker"
+    min_severity: "blocker"
+    maps_to: ["RBI-014", "CFPB-REG-B", "EU-AI-ACT-ART-13"]
+    min_mitigations: 1
+    detection: "structural"
+    structured_mode_required: true
+    required_fields:
+      - "ReasonCode"
+      - "FeatureAttribution"
+    # Legacy runtime_pattern kept for conversational mode only
+    runtime_pattern: '(?i)(I cannot explain|black-box|no reasoning|unexplainable)'
+    primitives:
+      action: withhold
+      object: machine_readable_explanations
+      context: structured_output
+      authority: black_box_model
+      flow: opaque_decisioning
+
+  - id: "ETH-003"
+    name: "Human Oversight Removal"
+    source: "FINOS"
+    original_id: "Ri-020"
+    category: "safety"
+    description: >
+      AI systems make consequential decisions autonomously without human review.
+    severity: "blocker"
+    min_severity: "blocker"
+    runtime_pattern: '(?i)(no human|fully automated|autonomous decision|bypass review)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: bypass
+      object: human_review
+      context: autonomous_decision
+      authority: agentic_workflow
+      flow: automated_control_loop
+
+  - id: "ETH-004"
+    name: "Toxic Output"
+    source: "FINOS"
+    original_id: "Ri-023"
+    category: "safety"
+    description: >
+      AI models generate harmful, abusive, or toxic content.
+    severity: "error"
+    min_severity: "warning"
+    runtime_pattern: '(?i)(hate|kill|murder|bomb|terrorist|slur|offensive)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: generate
+      object: harmful_content
+      context: model_response
+      authority: generative_model
+      flow: egress_stream

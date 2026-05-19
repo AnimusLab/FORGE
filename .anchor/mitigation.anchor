@@ -1,0 +1,98 @@
+# =============================================================================
+# ANCHOR MITIGATION CATALOG — Detection Patterns (v3.1.0)
+# =============================================================================
+# This file defines the HOW — the detection patterns for risks.
+# Patterns are "regex" (line-level) or "ast" (tree-sitter queries).
+#
+# DESIGN PRINCIPLE: Patterns must be CONTEXT-AWARE.
+#   ✅ Flag: prompt = f"Process: {user_input}"
+#   ❌ Skip: click.echo(f"Loaded {count} rules")
+#
+# COMPLETE COVERAGE: All ANC-001 through ANC-023 (FINOS 23 rules)
+# =============================================================================
+
+version: "3.1.0"
+
+mitigations:
+  # --- SEC-006: Raw Network Access ---
+  - id: "MIT-001-A"
+    rule_id: "SEC-006"
+    name: "Public LLM Endpoint Detection"
+    match:
+      type: "regex"
+      # Requires SDK instantiation or URL assignment — skips strings and comments
+      pattern: >-
+        ^(?:[^"\'#]|(["\'])(?:(?!\1).|\\\1)*\1)*\b(=\s*["']https?://api\.(openai|anthropic|cohere)\.(com|ai)|openai\.Client|anthropic\.Anthropic\(|cohere\.Client)
+    message: "Direct call to public LLM API detected. Route through a PII-scrubbing proxy."
+    severity: "error"
+
+  # --- SEC-002: Data Poisoning ---
+  - id: "MIT-002-A"
+    rule_id: "SEC-002"
+    name: "Unencrypted Vector Store Upsert"
+    match:
+      type: "regex"
+      # Refinement: removed .add() as it's too common for sets/lists.
+      # Vector stores typically use add_texts, add_documents, or upsert.
+      pattern: >-
+        ^(?:[^"\'#]|(["\'])(?:(?!\1).|\\\1)*\1)*\.\b(upsert|add_texts|add_documents)\s*\((?!.*encrypt)
+    message: "Vector store write detected without encryption. Embeddings can leak sensitive data via inversion attacks."
+    severity: "error"
+
+  # --- ALN-001: Hallucination ---
+  - id: "MIT-003-A"
+    rule_id: "ALN-001"
+    name: "LLM Output Without Validation"
+    match:
+      type: "regex"
+      pattern: >-
+        ^(?:[^"\'#]|(["\'])(?:(?!\1).|\\\1)*\1)*\.\b(ChatCompletion|completions|messages)\.(create|send)\s*\(
+    message: "LLM API call detected. Ensure output is validated before use (e.g., schema check, grounding)."
+    severity: "error"
+
+  # --- SEC-007: Shell Injection (os-level) ---
+  - id: "MIT-014-A"
+    rule_id: "SEC-007"
+    name: "Shell Command Execution"
+    match:
+      type: "regex"
+      # Simplified to match os.system/popen anywhere in the line, ignoring preceding code
+      pattern: >-
+        \bos\.(system|popen|spawn)\s*\(
+    message: "Potential shell injection via os.system detects. Use subprocess with list arguments instead."
+    severity: "blocker"
+
+  # --- SEC-007: Shell Injection (subprocess-level) ---
+  - id: "MIT-014-B"
+    rule_id: "SEC-007"
+    name: "Unsandboxed Subprocess in Agent"
+    match:
+      type: "regex"
+      # Excludes occurrences inside string literals or comments
+      pattern: >-
+        ^(?:[^"\'#]|(["\'])(?:(?!\1).|\\\1)*\1)*\bsubprocess\.(run|call|Popen|check_output)\s*\(
+    message: "Native subprocess execution detected. Use Diamond Cage (WASM) sandboxing for agent tools."
+    severity: "blocker"
+
+  # --- SEC-004: Credential Harvesting ---
+  - id: "MIT-004-A"
+    rule_id: "SEC-004"
+    name: "Bulk Env Variable Access"
+    match:
+      type: "regex"
+      # Only fire on bulk access or sensitive key names
+      pattern: >-
+        ^(?:[^"\'#]|(["\'])(?:(?!\1).|\\\1)*\1)*\bos\.(environ\.(copy|items)\(\)|\benviron\b\s*\[.*(?i)(TOKEN|KEY|SECRET|PASSWORD|CREDENTIAL|API).*\]|\{\*\*os\.environ)
+    message: "Broad environment variable access detected. Agents may harvest secrets from env."
+    severity: "error"
+  # --- SEC-012: Governance Configuration Modification ---
+  - id: "MIT-012-A"
+    rule_id: "SEC-012"
+    name: "Governance File Modification Detection"
+    match:
+      type: "regex"
+      # Detects attempts to write to .anchor files or constitution.anchor
+      pattern: >-
+        \.(write|save|update)\s*\(.*\.anchor["']
+    message: "Unauthorized attempt to modify Anchor governance configuration detected. Governance state must be immutable at runtime."
+    severity: "blocker"

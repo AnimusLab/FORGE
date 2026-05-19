@@ -1,0 +1,261 @@
+type: framework
+namespace: SEBI
+version: "2025-06"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+opt_in: true
+source: "SEBI Consultation Papers on AI/ML in Securities Markets"
+source_url: "https://www.sebi.gov.in/reports-and-statistics/reports/jun-2025/consultation-paper-on-guidelines-for-responsible-usage-of-ai-ml-in-indian-securities-markets_94687.html"
+source_date: "June 2025"
+credit: >
+  Securities and Exchange Board of India consultation papers on
+  AI/ML governance (November 2024 and June 2025). SEBI requires
+  all market participants using AI/ML tools to be responsible for
+  compliance with all applicable laws regardless of the method or
+  degree of AI adoption. Third-party vendor liability does not
+  transfer to SEBI-regulated entities.
+layer_2_status: >
+  Rules marked obligation_type: provenance or audit depend on
+  AnchorRuntime (Layer 2) and the Decision Audit Chain (DAC).
+  Layer 2 is currently in development.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "SEBI-001"
+    name: "Senior Management Oversight — Designated Responsibility"
+    original_id: "SEBI AI/ML Requirement 1"
+    maps_to: "ETH-003"
+    obligation_type: disclosure
+    anchor_mechanism: >
+      Board-approved policy.anchor with sealed constitution.anchor
+      constitutes the governance policy artifact. anchor audit
+      --report generates the oversight documentation for senior
+      management sign-off.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      Market participants using AI/ML must designate senior management
+      with technical expertise to oversee AI tool performance and
+      control. Board-level oversight with named accountability is
+      mandatory and cannot be delegated to vendors or technical teams.
+      SEBI requires that senior management understand and be
+      accountable for every AI tool deployed in trading, advisory,
+      and compliance functions.
+    primitives:
+      action: designate
+      object: senior_management_responsibility
+      context: market_participation
+      authority: board_of_directors
+      flow: oversight_accountability_flow
+
+  - id: "SEBI-002"
+    name: "Model Validation, Documentation and Interpretability"
+    original_id: "SEBI AI/ML Requirement 2"
+    maps_to: "ETH-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-002 explainability absence fires on black-box model usage.
+      TRANS-* violation category covers transparency and documentation
+      gaps. PROV-001 fires on AI output without model version.
+      Layer 1 detection active now.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      Market participants must maintain validation documentation and
+      ensure interpretability of AI models. Outcomes must be
+      explainable, traceable, and repeatable. Documentation explaining
+      the logic of AI/ML models is mandatory — not optional. SEBI
+      specifically requires that AI model decisions be capable of
+      being explained to the regulator, the firm's board, and
+      affected investors.
+    primitives:
+      action: explain
+      object: model_logic
+      context: jurisdictional_audit
+      authority: registered_entity
+      flow: reasoning_traceability_flow
+
+  - id: "SEBI-003"
+    name: "Periodic Accuracy Reporting to SEBI"
+    original_id: "SEBI AI/ML Requirement 3"
+    maps_to: "DAC-AuditLog"
+    obligation_type: audit
+    anchor_mechanism: >
+      anchor audit --report generates JSON and Markdown accuracy
+      and compliance reports. /audit endpoint exposes the full
+      audit chain for regulator access. Layer 2 in development
+      for full continuous reporting support.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      Market participants must share AI/ML accuracy results and
+      audit findings with SEBI on a periodic basis. These are not
+      internal records — they must be shareable with the regulator
+      in a structured format. Anchor's audit report output provides
+      the structured compliance evidence that satisfies this periodic
+      reporting obligation.
+    primitives:
+      action: report
+      object: ai_accuracy_results
+      context: periodic_supervisory_filing
+      authority: market_participant
+      flow: accuracy_disclosure_flow
+
+  - id: "SEBI-004"
+    name: "5-Year Input and Output Data Retention"
+    original_id: "SEBI AI/ML Requirement 4"
+    maps_to: "DAC-AuditEntry"
+    obligation_type: provenance
+    anchor_mechanism: >
+      DAC AuditEntry records input_hash + output_hash per decision
+      with ISO 8601 timestamp. Append-only log provides 5-year
+      retention with tamper-evident integrity. Layer 2 in development.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      Market participants must maintain documentation of all models
+      and store input and output data for at least 5 years. This
+      applies to all AI systems used in trading, advisory, and
+      compliance functions. Five years is the statutory limitation
+      period for most SEBI enforcement actions — data retention for
+      this period ensures that the firm can defend against any
+      regulatory inquiry within that window.
+    primitives:
+      action: retain
+      object: input_output_data
+      context: five_year_statutory_limitation
+      authority: decision_audit_chain
+      flow: tamper_evident_persistence
+
+  - id: "SEBI-005"
+    name: "Segregated Testing Environment Before Deployment"
+    original_id: "SEBI AI/ML Requirement 5"
+    maps_to: "LEG-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      anchor check in CI/CD acts as the pre-deployment governance
+      gate. Diamond Cage WASM sandbox provides the segregated
+      runtime testing environment for high-risk operations.
+      Layer 1 active now.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      AI/ML models must be tested in a segregated environment before
+      deployment. Shadow testing with live traffic is required.
+      Models must be validated in both stressed and unstressed
+      market conditions before going live. SEBI explicitly requires
+      this because live market conditions — volatility spikes,
+      liquidity crises, unusual order patterns — may expose model
+      failures that standard testing environments do not surface.
+    primitives:
+      action: gate
+      object: ai_deployment_artifact
+      context: segregated_testing_environment
+      authority: governance_enforcer
+      flow: shadow_testing_flow
+
+  - id: "SEBI-006"
+    name: "Continuous Monitoring as AI Models Evolve"
+    original_id: "SEBI AI/ML Requirement 6"
+    maps_to: "SUP-003"
+    obligation_type: provenance
+    anchor_mechanism: >
+      SUP-003 versioning drift violation fires on undeclared model
+      version changes. AnchorRuntime continuous eval provides
+      post-deployment monitoring. model_version in AuditEntry
+      per decision enables drift detection. Layer 2 in development.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      SEBI explicitly notes that AI models may change behavior over
+      time. Continuous monitoring systems are required beyond
+      traditional one-time testing. Model drift detection is a
+      regulatory expectation — not a best practice. A model that
+      was validated at deployment is not necessarily the same model
+      six months later, and SEBI requires that organizations have
+      systems in place to detect and respond to that drift.
+    primitives:
+      action: detect
+      object: model_behavioral_drift
+      context: post_deployment_operation
+      authority: anchor_runtime_service
+      flow: continuous_evaluation_flow
+
+  - id: "SEBI-007"
+    name: "Investor Disclosures for AI-Driven Decisions"
+    original_id: "SEBI AI/ML Requirement 7"
+    maps_to: "ETH-002"
+    obligation_type: disclosure
+    anchor_mechanism: >
+      ETH-002 explainability absence detection. adverse_action_reasons()
+      provides investor-facing reason codes. anchor audit --report
+      generates disclosure artifacts. Layer 1 active now.
+    severity: "error"
+    min_severity: "warning"
+    description: >
+      Market participants using AI in customer-facing decisions must
+      disclose product features, purpose, risks, model accuracy,
+      fees, and data quality used for decisions. Language must be
+      comprehensible to investors, not just technical staff. Investor
+      grievance mechanisms for AI-driven decisions must be established
+      and documented.
+    primitives:
+      action: disclose
+      object: ai_decision_features
+      context: investor_grievance_mechanism
+      authority: market_participant
+      flow: investor_transparency_flow
+
+  - id: "SEBI-008"
+    name: "No Discriminatory AI Outputs — Fairness Mandatory"
+    original_id: "SEBI AI/ML Requirement 8"
+    maps_to: "ETH-001"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-001 bias and discrimination detection active in Layer 1.
+      BIAS-* violation category fires on protected attribute usage
+      in feature vectors and decision outputs.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      AI/ML models must not favor or discriminate against any group
+      of clients or customers. Data quality must be sufficiently
+      broad, relevant, and complete to support fair outcomes.
+      Processes to identify and remove biases from datasets are
+      required. Training courses on data bias are mandatory for
+      data scientists developing AI systems for SEBI-regulated
+      market participants.
+    primitives:
+      action: audit
+      object: discriminatory_outputs
+      context: data_quality_governance
+      authority: predictive_model
+      flow: fair_outcomes_egress
+
+  - id: "SEBI-010"
+    name: "Third-Party AI Vendor Accountability — No Transfer"
+    original_id: "SEBI AI/ML Requirement 10"
+    maps_to: "DAC-AuditEntry"
+    obligation_type: provenance
+    anchor_mechanism: >
+      Non-repudiation chain — the deploying firm's AuditEntry
+      signed with their key proves ownership of every AI decision
+      regardless of which vendor's model produced it. Layer 2
+      in development.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      Using a third-party AI tool does not transfer regulatory
+      liability to the vendor. Market participants are solely
+      responsible for the consequences of deploying any AI tool
+      regardless of who built it. SLAs with AI vendors must include
+      regulatory compliance obligations — but even contractual
+      protections do not transfer the regulatory liability that
+      SEBI places on the market participant.
+    primitives:
+      action: sign
+      object: third_party_decision_audit
+      context: non_transferable_liability
+      authority: deploying_firm_key
+      flow: liability_ownership_flow

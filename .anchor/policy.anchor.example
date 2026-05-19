@@ -1,0 +1,105 @@
+# policy.anchor.example
+# ─────────────────────────────────────────────────────────────
+# ANCHOR V4 — PROJECT POLICY TEMPLATE
+# ─────────────────────────────────────────────────────────────
+#
+# This is YOUR organisation's private governance overlay.
+#
+# WHAT THIS FILE IS:
+#   Your local executive order. You write this. Anchor enforces it.
+#   It runs on top of the constitutional rules — adding to them,
+#   never replacing them.
+#
+# WHAT THIS FILE IS NOT:
+#   A place to weaken governance. The floor is absolute.
+#
+# THE FOUR RULES:
+#   1. You CAN raise severity    (warning → error → blocker)
+#   2. You CANNOT lower severity (blocker → error is REJECTED)
+#   3. You CANNOT suppress constitutional rules
+#   4. You CAN add INTERNAL-* custom rules specific to your stack
+#
+# GIT:
+#   This file is automatically gitignored by anchor init.
+#   It contains your internal security posture — never commit it.
+#
+# ─────────────────────────────────────────────────────────────
+
+version: "4.0"
+
+metadata:
+  project: "your-project-name"
+  org: "Your Organisation"
+  maintainer: "security@yourorg.com"
+
+# ── SEVERITY OVERRIDES ───────────────────────────────────────
+# Raise the floor for rules that are higher risk in your context.
+# ONLY raising is permitted. The engine rejects any lowering.
+
+overrides:
+
+  # Example: PCI-DSS scope — raw LLM API calls must be blocked
+  # - id: SEC-006
+  #   severity: blocker
+  #   reason: >
+  #     Our PCI-DSS scope requires blocking all direct LLM API
+  #     calls. All model traffic must route through the governed proxy.
+
+  # Example: RBI-regulated — explainability is mandatory, not a warning
+  # - id: ETH-002
+  #   severity: error
+  #   reason: >
+  #     RBI FREE-AI Recommendation 14 requires explainability for
+  #     all AI-assisted credit decisions. Raising from warning.
+
+  # Example: Agentic system — versioning drift must fail the build
+  # - id: SUP-003
+  #   severity: error
+  #   reason: >
+  #     Our agent fleet requires pinned model versions. Unpinned
+  #     versions are a deployment blocker for our release process.
+
+# ── CUSTOM RULES ─────────────────────────────────────────────
+# Organisation-specific rules not in the constitution.
+# Must use INTERNAL- prefix. Will appear in all audit reports.
+
+custom_rules:
+
+  # Example: Internal vault access pattern
+  # - id: INTERNAL-001
+  #   name: "Vault Access Outside Approved Namespace"
+  #   severity: blocker
+  #   category: security
+  #   description: >
+  #     Vault read operations must only access the approved_keys
+  #     namespace. Broad vault access exposes all secrets.
+  #   detection:
+  #     method: regex
+  #     pattern: 'vault\.read\((?!approved_keys)'
+  #     context_required: code_execution
+
+  # Example: Unapproved model endpoint
+  # - id: INTERNAL-002
+  #   name: "Unapproved AI Model Endpoint"
+  #   severity: blocker
+  #   category: security
+  #   description: >
+  #     Only approved internal model endpoints may be called.
+  #     External endpoints bypass the governed proxy layer.
+  #   detection:
+  #     method: regex
+  #     pattern: 'model_endpoint.*(?!approved-models\.internal)'
+  #     context_required: code_execution
+
+  # Example: Prohibited data source in production
+  # - id: INTERNAL-003
+  #   name: "Prohibited Training Data Source"
+  #   severity: error
+  #   category: legal
+  #   description: >
+  #     Scraped social media data is prohibited in production
+  #     models under our data governance policy.
+  #   detection:
+  #     method: regex
+  #     pattern: 'load_dataset\(["\']twitter|load_dataset\(["\']reddit'
+  #     context_required: code_execution

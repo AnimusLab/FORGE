@@ -1,0 +1,51 @@
+type: domain
+namespace: LEG
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+always_loaded: false
+description: >
+  Legal violations in AI systems. Covers intellectual property
+  infringement in training data and outputs, and regulatory
+  non-compliance with applicable AI governance frameworks.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "LEG-001"
+    name: "IP Infringement"
+    source: "FINOS"
+    original_id: "Ri-018"
+    category: "compliance"
+    description: >
+      AI models producing content that reproduces copyrighted material.
+    severity: "warning"
+    min_severity: "info"
+    runtime_pattern: '(?i)(copyright|trademark|patent|proprietary|all rights reserved|confidential|trade secret)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: reproduce
+      object: copyrighted_material
+      context: training_data_overlap
+      authority: generative_model
+      flow: ip_infringement_flow
+
+  - id: "LEG-002"
+    name: "Regulatory Non-Compliance"
+    source: "FINOS"
+    original_id: "Ri-019"
+    category: "compliance"
+    description: >
+      AI systems deployed without documented compliance with regulatory frameworks.
+    severity: "error"
+    min_severity: "error"
+    runtime_pattern: '(?i)(non-compliant|violation|regulation|mandate|compliance failure|article 13|article 14)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: violate
+      object: jurisdictional_laws
+      context: undocumented_compliance
+      authority: deploying_organization
+      flow: legal_violation

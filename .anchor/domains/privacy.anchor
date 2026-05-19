@@ -1,0 +1,79 @@
+type: domain
+namespace: PRV
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+always_loaded: false
+description: >
+  Privacy violations in AI systems. Covers PII leakage to external
+  models, vector store inversion attacks, and cross-context data bleed.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "PRV-001"
+    name: "PII Leakage to Hosted Model"
+    source: "FINOS"
+    original_id: "Ri-015"
+    category: "privacy"
+    description: >
+      Personally identifiable information — names, account numbers,
+      transaction history, health data, biometric data, or any data
+      that can identify an individual — is transmitted to third-party
+      hosted AI models without adequate data governance controls.
+      Third-party models may memorize, log, or inadvertently reproduce
+      PII in subsequent completions. In Indian financial services, this
+      violates the DPDP Act 2023 purpose limitation requirement —
+      customer data collected for lending cannot be transmitted to
+      an external AI provider for general model training. It also
+      violates RBI Digital Lending Directions on data residency and
+      GDPR Article 6 lawful basis requirements for EU-facing operations.
+    severity: "blocker"
+    min_severity: "error"
+    min_mitigations: 1
+    runtime_pattern: '(?i)(\b\d{3}-\d{2}-\d{4}\b|\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[ -]??){13,16}\b)'
+    detection: ~
+    primitives:
+      action: transmit
+      object: personally_identifiable_info
+      context: third_party_hosted_model
+      authority: unauthorized_data_flow
+      flow: pii_leakage
+
+  - id: "PRV-002"
+    name: "Vector Inversion Attack"
+    source: "FINOS"
+    original_id: "Ri-016"
+    category: "privacy"
+    description: >
+      Embeddings stored in vector databases can be used to reconstruct original data.
+    severity: "error"
+    min_severity: "warning"
+    runtime_pattern: '(?i)(embedding|vector store|inversion|reconstruct|recover sensitive)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: reconstruct
+      object: original_sensitive_data
+      context: embedding_extraction
+      authority: adversarial_inference
+      flow: inversion_attack
+
+  - id: "PRV-003"
+    name: "Cross-context Data Bleed"
+    source: "FINOS"
+    original_id: "Ri-022"
+    category: "privacy"
+    description: >
+      Data from one user's context contaminates another user's context.
+    severity: "error"
+    min_severity: "warning"
+    runtime_pattern: '(?i)(cross-context|bleed|contamination|shared session|tenant|leakage from session)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: contaminate
+      object: user_session_context
+      context: cross_tenant_leakage
+      authority: shared_state_artifact
+      flow: context_bleeding

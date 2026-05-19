@@ -1,0 +1,172 @@
+type: framework
+namespace: FCA
+version: "2024"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+opt_in: true
+source: "FCA AI Governance Guidance 2024 and FCA Consumer Duty"
+source_url: "https://www.fca.org.uk/publications/feedback-statements/fs23-6-artifical-intelligence-machine-learning"
+source_date: "2024"
+credit: >
+  UK Financial Conduct Authority guidance on AI governance
+  (FS23/6 Feedback Statement and subsequent 2024 guidance).
+  FCA Consumer Duty effective July 31, 2023. FCA guidance
+  effective September 2026 links AI governance failures to
+  fitness and propriety of compliance leadership — CCOs and
+  CROs can be held personally accountable for AI governance
+  failures from that date.
+layer_2_status: >
+  Rules marked obligation_type: provenance or audit depend on
+  AnchorRuntime (Layer 2) and the Decision Audit Chain (DAC).
+  Layer 2 is currently in development.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "FCA-001"
+    name: "Human Oversight Records — AI-Assisted Decisions"
+    original_id: "FCA AI Governance Guidance 2024"
+    maps_to: "ETH-003"
+    obligation_type: audit
+    anchor_mechanism: >
+      DAC query API /audit exposes full oversight record.
+      ETH-003 human oversight removal violation fires on
+      autonomous decision code without human review checkpoint.
+      AuditEntry records compliant boolean per decision.
+      Layer 2 in development.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      FCA 2024 guidance requires firms to demonstrate human oversight
+      and maintain records of AI-assisted decisions sufficient to
+      support supervisory review. Oversight must be documented —
+      not merely stated in policy. A firm that claims to have human
+      oversight but cannot produce records demonstrating that oversight
+      occurred for specific decisions does not satisfy this requirement.
+      The FCA has indicated that oversight records will be a primary
+      focus of AI-related supervisory visits.
+    primitives:
+      action: demonstrate
+      object: human_oversight
+      context: supervisory_review
+      authority: human_reviewer
+      flow: oversight_record_egress
+
+  - id: "FCA-002"
+    name: "Model Version Traceability Per Decision"
+    original_id: "FCA AI Governance Guidance 2024"
+    maps_to: "SUP-003"
+    obligation_type: provenance
+    anchor_mechanism: >
+      model_version in every AuditEntry records exact model version
+      per decision. SUP-003 versioning drift violation fires on
+      undeclared model version changes. Layer 2 in development.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      FCA requires firms to maintain records showing which version
+      of which model produced which decision. Model version
+      traceability must be continuous — not just documented at
+      the point of initial deployment. When a model is updated,
+      the version change must be logged, and historical decisions
+      must remain traceable to the model version that produced them.
+      This requirement is a prerequisite for any post-hoc supervisory
+      review of AI-assisted decisions.
+    primitives:
+      action: respond
+      object: model_version_query
+      context: post_hoc_supervisory_review
+      authority: decision_audit_chain
+      flow: version_traceability_flow
+
+  - id: "FCA-003"
+    name: "CCO Personal Liability — AI Governance Failures"
+    original_id: "FCA Guidance September 2026"
+    maps_to: "ETH-003"
+    obligation_type: disclosure
+    anchor_mechanism: >
+      Signed DAC audit chain is the CCO's evidence of governance.
+      anchor audit --report generates the compliance record that
+      demonstrates active governance during the relevant period.
+      A CCO who can produce sealed, timestamped governance records
+      has documented evidence of their oversight function.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      From September 2026, FCA guidance links AI governance failures
+      to the fitness and propriety of compliance leadership. Chief
+      Compliance Officers and Chief Risk Officers can be held
+      personally accountable for AI governance failures — not just
+      the firm. This transforms AI governance from a corporate risk
+      into a personal career risk for named compliance individuals.
+      The only defense is documented, demonstrable governance —
+      which Anchor's sealed audit chain provides. A CCO who cannot
+      produce evidence of active AI governance when the FCA asks
+      is personally exposed.
+    primitives:
+      action: produce
+      object: active_governance_evidence
+      context: fitness_and_propriety
+      authority: named_compliance_officer
+      flow: governance_attestation_flow
+
+  - id: "FCA-004"
+    name: "AML AI Output Cryptographic Verification"
+    original_id: "FCA AML Guidance 2024"
+    maps_to: "SEC-006"
+    obligation_type: provenance
+    anchor_mechanism: >
+      AML-002 violation fires on AML output without output_hash
+      verification. output_hash in AuditEntry provides SHA-256
+      binding of every AML flagging result to the model output
+      that produced it. Layer 2 in development.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      FCA 2024 guidance on AML requires that AI-generated flagging
+      results be verifiable — displayed AML alerts must be
+      cryptographically linkable to the originating model output.
+      An AML alert that cannot be traced to a specific model output
+      at a specific timestamp is unverifiable, and an unverifiable
+      alert cannot form the basis of a suspicious activity report
+      that would survive regulatory scrutiny. This is particularly
+      critical in automated AML pipelines where human review
+      occurs after flagging rather than before.
+    primitives:
+      action: verify
+      object: aml_flagging_result
+      context: suspect_activity_report
+      authority: automated_aml_pipeline
+      flow: cryptographic_verification_flow
+
+  - id: "FCA-005"
+    name: "Consumer Duty — Good Outcomes for Retail Customers"
+    original_id: "FCA Consumer Duty PS22/9"
+    maps_to: "ETH-004"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-004 toxic output detection fires on harmful customer
+      communications. ETH-002 explainability absence fires on
+      opaque customer-facing AI decisions. SHR-003 reputational
+      and conduct risk covers Consumer Duty conduct obligations.
+      Layer 1 active now.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      FCA Consumer Duty requires firms to deliver good outcomes
+      for retail customers across four outcome areas: products
+      and services, price and value, consumer understanding, and
+      consumer support. For AI systems interacting with retail
+      customers, this means AI outputs must be accurate, fair,
+      and comprehensible — not optimized for firm metrics at the
+      expense of customer outcomes. An AI system that generates
+      misleading communications, opaque decisions, or outcomes
+      that systematically disadvantage retail customers violates
+      Consumer Duty regardless of technical compliance with
+      other regulatory requirements.
+    primitives:
+      action: deliver
+      object: good_customer_outcomes
+      context: retail_customer_interaction
+      authority: deploying_institution
+      flow: conduct_quality_flow

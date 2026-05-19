@@ -1,0 +1,281 @@
+type: domain
+namespace: SEC
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+always_loaded: true
+description: >
+  Security violations in AI-adjacent code. Covers prompt injection,
+  data poisoning, model tampering, credential harvesting, authorization
+  bypass, raw network access, shell injection, and supply chain attacks.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "SEC-001"
+    name: "Prompt Injection"
+    source: "FINOS"
+    original_id: "Ri-001"
+    category: "security"
+    description: >
+      An attacker manipulates an AI model's behavior by injecting malicious
+      instructions through untrusted input channels — user-supplied text,
+      document content, tool outputs, or any data that flows into a prompt
+      without sanitization. The model cannot distinguish between legitimate
+      instructions and injected ones, executing the attacker's intent
+      instead of the developer's. In financial systems, this can cause
+      models to leak customer data, bypass authorization logic, or generate
+      fraudulent outputs. Severity is BLOCKER because successful injection
+      can compromise the entire AI pipeline.
+    severity: "blocker"
+    min_severity: "error"
+    runtime_pattern: '(?i)(ignore previous|system prompt|jailbreak|DAN|Developer Mode|translate to|repeat after me|you are now)'
+    min_mitigations: 1
+    primitives:
+      action: inject
+      object: instructions
+      context: untrusted_prompt
+      authority: external_actor
+      flow: instruction_stack
+
+  - id: "SEC-002"
+    name: "Data Poisoning"
+    source: "FINOS"
+    original_id: "Ri-002"
+    category: "security"
+    description: >
+      Malicious or corrupted data is introduced into the training,
+      fine-tuning, or retrieval pipeline, causing the model to learn
+      incorrect behaviors, biased outputs, or backdoor triggers that
+      activate under specific conditions. In financial AI, poisoned
+      training data can cause credit models to systematically favor
+      or disadvantage specific demographic groups, or cause fraud
+      detection models to miss specific attack patterns. The attack
+      is particularly dangerous because poisoned behavior is baked
+      into the model weights and survives redeployment.
+    severity: "blocker"
+    min_severity: "error"
+    runtime_pattern: '(?i)(poisoned|corrupted data|fine-tuning trigger|backdoor|malicious label)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: corrupt
+      object: training_data
+      context: fine_tuning_pipeline
+      authority: malicious_actor
+      flow: data_pipeline
+
+  - id: "SEC-003"
+    name: "Model Tampering"
+    source: "FINOS"
+    original_id: "Ri-003"
+    category: "security"
+    description: >
+      The model's weights, architecture, or infrastructure are
+      compromised through supply chain attacks, unauthorized access
+      to model storage, or malicious modification of model artifacts
+      during transit or at rest. A tampered model may behave normally
+      under standard conditions while producing controlled failures
+      or data leakage under specific trigger inputs. In regulated
+      financial systems, model tampering is equivalent to tampering
+      with a financial instrument — it undermines the integrity of
+      every decision the model makes and cannot be detected without
+      cryptographic verification of model artifacts.
+    severity: "blocker"
+    min_severity: "blocker"
+    runtime_pattern: '(?i)(weights|hashes|tamper|corrupt model|malicious architecture)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: modify
+      object: model_weights
+      context: model_storage
+      authority: unauthorized_actor
+      flow: artifact_mutation
+
+  - id: "SEC-004"
+    name: "Credential Harvesting"
+    source: "FINOS"
+    original_id: "Ri-004"
+    category: "security"
+    description: >
+      AI agents or AI-adjacent code systematically access environment
+      variables, configuration files, or credential stores to extract
+      API keys, tokens, database passwords, or other secrets.
+    severity: "blocker"
+    min_severity: "error"
+    pattern: 'os\.environ'
+    runtime_pattern: '(?i)(aws_access_key_id|aws_secret_access_key|api[_\-]?key|secret[_\-]?key|auth[_\-]?token|-----BEGIN (RSA|EC|OPENSSH|PGP) PRIVATE KEY-----)'
+    match:
+      type: "function_call"
+      name: "os.environ"
+    mitigation: "Use os.environ.get('KEY', default) to fetch specific secrets."
+    primitives:
+      action: access
+      object: api_credentials
+      context: environment_variables
+      authority: ai_agent
+      flow: exfiltration_path
+
+  - id: "SEC-005"
+    name: "Authorization Bypass"
+    source: "FINOS"
+    original_id: "Ri-012"
+    category: "security"
+    description: >
+      AI agents or model-integrated code execute actions outside their
+      granted permissions or bypass authorization checks that would
+      normally gate access to sensitive operations. This includes
+      agents that call APIs without verifying caller identity, models
+      that generate code skipping permission checks, and agentic
+      workflows that escalate privileges by chaining tool calls that
+      individually appear authorized. In financial AI, authorization
+      bypass can allow unauthorized access to customer accounts,
+      trading systems, or regulatory reporting pipelines.
+    severity: "blocker"
+    min_severity: "blocker"
+    runtime_pattern: '(?i)(unauthorized|escalate|bypass check|skip auth|access denied)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: skip
+      object: permission_checks
+      context: tool_chaining
+      authority: model_agent
+      flow: privilege_escalation
+
+  - id: "SEC-006"
+    name: "Raw Network Access"
+    source: "FINOS"
+    original_id: "Ri-013"
+    category: "security"
+    description: >
+      AI components or model integration code make direct calls to
+      external LLM API endpoints, data sources, or third-party services
+      without routing through a governed proxy or backstop layer. Raw
+      network access bypasses governance controls, telemetry, rate
+      limiting, and audit logging. In regulated financial environments,
+      unproxied API calls to public LLM providers mean that sensitive
+      financial data and customer information may be transmitted to
+      external services without adequate data governance, violating
+      RBI Digital Lending Directions and EU AI Act data requirements.
+    severity: "error"
+    min_severity: "warning"
+    detection: ~
+    primitives:
+      action: egress
+      object: outbound_telemetry
+      context: unproxied_request
+      authority: ai_component
+      flow: direct_network
+
+  - id: "SEC-007"
+    name: "Shell Injection"
+    source: "FINOS"
+    original_id: "Ri-014"
+    category: "security"
+    description: >
+      Executing shell commands constructed from untrusted model input.
+    severity: "blocker"
+    min_severity: "error"
+    pattern: 'os\.(system|popen|spawn)'
+    runtime_pattern: '(?i)(rm\s+-rf\s+[/~]|curl\s+[^\s]+\s*\|\s*(bash|sh|zsh|fish)|subprocess\.(run|call|Popen|check_output)\s*\(.*shell\s*=\s*True)'
+    match:
+      type: "function_call"
+      name: "os.system"
+    mitigation: "Use subprocess with shell=False and list arguments."
+    primitives:
+      action: execute
+      object: shell_commands
+      context: untrusted_input
+      authority: sub_process
+      flow: control_flow
+
+  - id: "SEC-008"
+    name: "Insecure Deserialization"
+    source: "FINOS"
+    original_id: "Ri-015"
+    category: "security"
+    description: >
+      Untrusted model input or AI-adjacent components processing
+      serialized data without adequate validation.
+    severity: "error"
+    min_severity: "warning"
+    min_mitigations: 1
+    primitives:
+      action: process
+      object: serialized_data
+      context: untrusted_input
+      authority: data_parser
+      flow: object_instantiation
+
+  - id: "SEC-009"
+    name: "SQL Injection"
+    source: "FINOS"
+    category: "security"
+    description: >
+      Model-generated or tool-integrated code that performs SQL string
+      concatenation instead of using parameterized queries.
+    severity: "blocker"
+    min_severity: "error"
+    runtime_pattern: "(?i)(SELECT.*FROM.*WHERE.*=.*'.*f-string|INSERT INTO.*VALUES.*%s)"
+    mitigation: "Use parameterized queries or ORMs."
+    primitives:
+      action: concatenate
+      object: sql_queries
+      context: dynamic_query
+      authority: tool_integrated_code
+      flow: database_ingress
+
+  - id: "SEC-010"
+    name: "Insecure Python Execution"
+    source: "FINOS"
+    category: "security"
+    description: >
+      Execution of untrusted model-generated Python code using eval, 
+      exec, or dynamic imports without a restricted sandbox.
+    severity: "blocker"
+    min_severity: "blocker"
+    runtime_pattern: '(?i)(eval\(|exec\(|__import__\(|getattr\(.*"eval"|getattr\(.*"exec")'
+    mitigation: "Use restricted Python sandboxes (Diamond Cage) instead of eval/exec."
+    primitives:
+      action: execute
+      object: python_code
+      context: dynamic_imports
+      authority: generative_model
+      flow: runtime_exec
+
+  - id: "SEC-011"
+    name: "Supply Chain Attack"
+    source: "FINOS"
+    original_id: "Ri-017"
+    category: "security"
+    description: >
+      Compromised dependencies, model repositories, MCP servers, or
+      third-party AI tool integrations introduce malicious code or
+      model artifacts into the AI pipeline.
+    severity: "blocker"
+    min_severity: "error"
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: compromise
+      object: upstream_dependency
+      context: model_repository
+      authority: compromised_vendor
+      flow: supply_chain_flow
+
+  - id: "SEC-012"
+    name: "Governance Configuration Modification"
+    source: "Anchor-V5"
+    category: "security"
+    description: "Unauthorized or unrestricted modification of foundational governance configuration files and policy manifests."
+    severity: "blocker"
+    min_severity: "blocker"
+    min_mitigations: 1
+    primitives:
+      action: modify
+      object: governance_configuration
+      context: unrestricted
+      authority: unauthorised_actor
+      flow: direct_mutation

@@ -1,0 +1,187 @@
+type: framework
+namespace: USSEC
+version: "2026"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+opt_in: true
+source: "US Securities and Exchange Commission — 2026 Examination Priorities and AI Governance Guidance"
+source_url: "https://www.sec.gov/exams/announcement/exam-priorities-2026.pdf"
+source_date: "January 2026"
+credit: >
+  US Securities and Exchange Commission 2026 Examination Priorities,
+  published January 2026 by the SEC Division of Examinations. AI
+  governance was named the top examination priority for 2026 —
+  overtaking cryptocurrency for the first time in the agency's
+  published examination schedule. The SEC has indicated that
+  'AI washing' — overstating AI capabilities or governance maturity
+  — constitutes securities fraud exposure under existing law.
+  Applies to SEC-registered investment advisers, broker-dealers,
+  and any firm using AI in securities-related activities.
+layer_2_status: >
+  Rules marked obligation_type: provenance or audit depend on
+  AnchorRuntime (Layer 2) and the Decision Audit Chain (DAC).
+  Layer 2 is currently in development.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "USSEC-001"
+    name: "AI Governance — Top Examination Priority 2026"
+    original_id: "SEC 2026 Examination Priority 1"
+    maps_to: "LEG-002"
+    obligation_type: disclosure
+    anchor_mechanism: >
+      Sealed constitution.anchor + anchor audit --report generates
+      the AI governance documentation package that demonstrates
+      active, enforceable governance to SEC examiners. The SHA-256
+      sealed constitution proves the governance framework was in
+      place and enforced during the examination period.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      The SEC Division of Examinations identified AI governance as
+      the top examination priority for 2026 — the first time in the
+      agency's history that AI has overtaken cryptocurrency as the
+      primary focus. SEC-registered firms using AI in investment
+      advice, trading, compliance, or customer communications are
+      subject to examination specifically on AI governance practices.
+      Examiners will review whether firms have adequate policies,
+      procedures, and controls governing their AI systems — and
+      whether those controls are actually enforced, not just
+      documented on paper. Anchor's sealed, version-controlled
+      governance stack provides the technical evidence that
+      governance is active and enforceable.
+    primitives:
+      action: report
+      object: material_ai_risk
+      context: quarterly_filing
+      authority: registrant
+      flow: disclosure_flow
+
+  - id: "USSEC-002"
+    name: "AI Washing — Securities Fraud Exposure"
+    original_id: "SEC AI Washing Guidance 2026"
+    maps_to: "ALN-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      ALN-002 goal misrepresentation fires when AI system behavior
+      diverges from declared purpose. ETH-002 explainability absence
+      fires on black-box AI claims without verifiable explanation.
+      Layer 1 detection active now.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      The SEC has indicated that overstating AI capabilities,
+      misrepresenting AI governance maturity, or claiming AI-driven
+      investment processes that are not actually AI-driven constitutes
+      securities fraud exposure under existing law — not just a
+      regulatory violation. AI washing is the AI equivalent of
+      greenwashing: making claims about AI usage, accuracy, or
+      governance that are not substantiated by actual technical
+      controls. Firms that market AI-powered investment products
+      must be able to demonstrate that the AI described actually
+      exists, works as described, and is governed as claimed.
+      Anchor's audit chain provides the technical proof that
+      governance claims are substantiated.
+    primitives:
+      action: substantiates
+      object: governance_maturity
+      context: securities_fraud_exposure
+      authority: registered_entity
+      flow: substantiation_chain
+
+  - id: "USSEC-003"
+    name: "AI in Investment Advice — Fiduciary Obligations"
+    original_id: "SEC Regulation Best Interest + AI Guidance 2026"
+    maps_to: "ETH-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-002 explainability absence fires on AI investment
+      recommendation code without explainability hooks.
+      adverse_action_reasons() provides SEC-compliant reason
+      codes for AI-driven investment recommendations.
+      Layer 1 active now.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      Investment advisers using AI to generate investment
+      recommendations must satisfy Regulation Best Interest
+      obligations — the AI recommendation must be in the best
+      interest of the customer, not optimized for firm revenue.
+      The SEC has made clear that using an AI model does not
+      transfer or dilute the fiduciary obligations of the
+      registered investment adviser. AI-generated recommendations
+      must be explainable, traceable, and demonstrably aligned
+      with the customer's investment profile and risk tolerance.
+      A black-box AI generating investment advice without
+      explainability controls fails Regulation Best Interest.
+    primitives:
+      action: explain
+      object: ai_investment_recommendation
+      context: fiduciary_obligation
+      authority: investment_adviser
+      flow: reason_code_egress
+
+  - id: "USSEC-004"
+    name: "AI Model Risk in Trading Systems — Audit Trail"
+    original_id: "SEC 2026 Examination Priority — Trading AI"
+    maps_to: "DAC-AuditEntry"
+    obligation_type: provenance
+    anchor_mechanism: >
+      DAC AuditEntry records every AI-assisted trading decision
+      with model_id, model_version, input_hash, output_hash,
+      timestamp, and chain_hash. Full tamper-evident audit chain
+      survives legal discovery. Layer 2 in development.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      AI systems used in trading — algorithmic trading, order
+      routing, risk management, and market surveillance — are
+      subject to SEC examination specifically on model risk
+      management and audit trail requirements. The SEC expects
+      firms to maintain records of AI trading decisions sufficient
+      to reconstruct the circumstances of any trade under review.
+      An AI trading system that cannot produce a tamper-evident
+      record of what it decided, when, on what data, and at what
+      model version cannot satisfy SEC examination requirements
+      and creates significant regulatory exposure in the event
+      of a market disruption inquiry.
+    primitives:
+      action: reconstruct
+      object: ai_assisted_trading_decision
+      context: SEC_examination
+      authority: market_surveillance
+      flow: audit_trail_reconstruction
+
+  - id: "USSEC-005"
+    name: "Cybersecurity of AI Systems — SEC Rule 10"
+    original_id: "SEC Cybersecurity Rule (Rule 10) + AI Guidance 2026"
+    maps_to: "SEC-001"
+    obligation_type: detection
+    anchor_mechanism: >
+      SEC-001 prompt injection, SEC-002 data poisoning, SEC-003
+      model tampering, AGT-001 through AGT-005 agentic security
+      rules provide the technical detection layer for AI-specific
+      cybersecurity threats under SEC Rule 10.
+      Layer 1 active now.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      SEC Rule 10 on cybersecurity requires registered firms to
+      have policies and procedures reasonably designed to address
+      cybersecurity risks. The SEC's 2026 examination priorities
+      extend this to AI-specific cybersecurity threats — prompt
+      injection, model tampering, adversarial attacks, and AI
+      supply chain compromise. Firms using AI in trading or
+      investment advisory must demonstrate that their AI systems
+      are protected against the specific attack vectors that
+      target AI infrastructure, not just general cybersecurity
+      threats. Anchor's SEC- and AGT- domain rules satisfy the
+      technical detection requirement for AI-specific cybersecurity
+      under SEC Rule 10.
+    primitives:
+      action: protect
+      object: ai_infrastructure
+      context: SEC_Rule_10
+      authority: registered_firm
+      flow: attack_vector_mitigation

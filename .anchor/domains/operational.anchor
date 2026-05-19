@@ -1,0 +1,32 @@
+type: domain
+namespace: OPS
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+always_loaded: false
+description: >
+  Operational violations in AI systems. Covers availability risks,
+  denial of service conditions, and missing circuit breakers in
+  AI-dependent critical financial infrastructure.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "OPS-001"
+    name: "Availability and Denial"
+    source: "FINOS"
+    original_id: "Ri-011"
+    category: "operations"
+    description: >
+      AI systems in critical financial infrastructure lack circuit breakers.
+    severity: "error"
+    min_severity: "warning"
+    runtime_pattern: '(?i)(timeout|rate limit|overload|denial of service|dos|resource exhaustion|infinite loop|recursion|slow response)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: exhaust
+      object: system_resources
+      context: critical_infrastructure
+      authority: malicious_request_stream
+      flow: denial_of_service

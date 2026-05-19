@@ -1,0 +1,19 @@
+================================================================================
+   ANCHOR GOVERNANCE VIOLATIONS
+================================================================================
+
+Scan Source: d:\FORGE
+Timestamp:   2026-05-19 01:58:40
+
+--- SCAN STATISTICS ---
+Files Scanned: 27
+Files Ignored: 9
+Total Files:   36
+Total Dirs:    9
+
+--- VIOLATION SUMMARY ---
+Total Findings: 0
+Breakdown:      0 Blocker/Error, 0 Warning, 0 Info, 0 Suppressed
+
+--------------------------------------------------------------------------------
+

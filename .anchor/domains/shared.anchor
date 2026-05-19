@@ -1,0 +1,132 @@
+type: domain
+namespace: SHR
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+always_loaded: true
+description: >
+  Cross-domain risks that span multiple governance boundaries
+  simultaneously. Shared rules cannot be cleanly owned by a
+  single domain — they represent systemic risks where the
+  failure mode touches security, ethics, legal, and operational
+  concerns at the same time. This file is always loaded
+  regardless of what other domains are active.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "SHR-001"
+    name: "Model Overreach and Expanded Use"
+    source: "FINOS"
+    original_id: "Ri-018"
+    domains: [LEG, ETH, ALN]
+    category: "governance"
+    description: >
+      An AI model is deployed or used beyond the validated context,
+      scope, or population for which it was developed, tested, and
+      approved — without re-validation, updated governance review,
+      or regulatory sign-off for the expanded use case. Model
+      overreach is a systemic risk that simultaneously breaches
+      legal obligations, ethical standards, and alignment
+      requirements. A credit scoring model validated for personal
+      loans being repurposed for small business lending without
+      re-validation violates EU AI Act conformity assessment
+      requirements for the new use case. A fraud detection model
+      trained on one demographic being applied to another without
+      bias re-testing violates ETH-001 fairness requirements.
+      An NLP model validated for internal document classification
+      being deployed in customer-facing decisions without transparency
+      review violates ETH-002 explainability requirements. Model
+      overreach is particularly dangerous in organizations moving
+      fast — the same model that works safely in one context can
+      cause systematic harm when the context changes without the
+      governance process catching up.
+    severity: "warning"
+    min_severity: "info"
+    runtime_pattern: '(?i)(repurpose|beyond scope|unvalidated|not approved for|unauthorized use|expanded context)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: repurpose
+      object: unvalidated_model
+      context: mismatch_context
+      authority: unverified_workflow
+      flow: context_drift
+
+  - id: "SHR-002"
+    name: "Data Quality and Model Drift"
+    source: "FINOS"
+    original_id: "Ri-019"
+    domains: [OPS, ALN, SUP]
+    category: "accuracy"
+    description: >
+      AI model performance silently degrades over time as production
+      data drifts away from the distribution of the training data,
+      upstream data pipelines introduce errors or schema changes, or
+      the real-world phenomena the model was trained to predict
+      evolve in ways the model cannot track. Data drift is not a
+      single event — it is a continuous operational and alignment
+      risk that simultaneously degrades accuracy, introduces bias,
+      and undermines supply chain integrity. In financial AI, data
+      drift is particularly dangerous because the consequences
+      are not immediately visible — a credit model that has drifted
+      may continue approving and rejecting loans at the same rate
+      while the quality of those decisions silently deteriorates.
+      SEBI requires continuous monitoring of AI models because it
+      explicitly recognizes that AI models may change behavior over
+      time. RBI FREE-AI Recommendation 24 requires AI inventory with
+      risk profiles maintained for supervisory inspection — a drifted
+      model whose risk profile no longer reflects its actual behavior
+      fails this requirement. Without continuous monitoring, data
+      drift is invisible until a failure event triggers a regulatory
+      inquiry.
+    severity: "warning"
+    min_severity: "info"
+    runtime_pattern: '(?i)(drift|degrade|performance drop|accuracy decay|out-of-distribution|stale data)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: degrade
+      object: prediction_accuracy
+      context: runtime_drift
+      authority: stale_data_pipeline
+      flow: silent_deterioration
+
+  - id: "SHR-003"
+    name: "Reputational and Conduct Risk"
+    source: "FINOS"
+    original_id: "Ri-020"
+    domains: [ETH, LEG]
+    category: "governance"
+    description: >
+      AI systems generate outputs or make decisions that, while not
+      triggering a specific security or privacy violation, cause
+      material reputational harm, regulatory conduct concerns, or
+      brand damage for the deploying organization. Reputational risk
+      in AI spans both domains simultaneously — it is an ethics
+      failure because the model's behavior falls below the conduct
+      standards required for customer-facing AI, and a legal risk
+      because reputational damage from AI misconduct has triggered
+      regulatory action and litigation. FCA Consumer Duty requires
+      firms to deliver good outcomes for retail customers — an AI
+      model that systematically provides poor advice, denies services
+      without adequate justification, or treats customers unfairly
+      triggers conduct risk regardless of technical compliance. In
+      Indian financial services, RBI FREE-AI Pillar 5 (Protection)
+      and Pillar 2 (Governance) both address consumer protection
+      obligations that go beyond technical rule compliance into
+      overall conduct quality. Reputational risk is difficult to
+      detect deterministically — it lives at the intersection of
+      model behavior and organizational context — which is why it
+      belongs in shared rather than any single domain.
+    severity: "error"
+    min_severity: "warning"
+    runtime_pattern: '(?i)(reputational|conduct|brand damage|unethical advice|poor outcome|retail customer harm)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: generate
+      object: poor_customer_outcomes
+      context: brand_sensitive_context
+      authority: conduct_misalignment
+      flow: reputation_impact

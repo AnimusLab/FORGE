@@ -1,0 +1,145 @@
+# ─────────────────────────────────────────────────────────────
+# Anchor V4 — Root Constitution
+# type: manifest
+# ─────────────────────────────────────────────────────────────
+
+type: manifest
+version: "5.0.3"
+anchor_version: ">=5.0.0"
+name: "Anchor Constitutional Root"
+
+core_domains:
+  - path: domains/security.anchor
+    namespace: SEC
+    required: true
+
+  - path: domains/ethics.anchor
+    namespace: ETH
+    required: true
+
+  - path: domains/shared.anchor
+    namespace: SHR
+    required: true
+
+  - path: domains/alignment.anchor
+    namespace: ALN
+    required: true
+
+  - path: domains/agentic.anchor
+    namespace: AGT
+    required: true
+
+  - path: domains/privacy.anchor
+    namespace: PRV
+    required: true
+
+  - path: domains/legal.anchor
+    namespace: LEG
+    required: true
+
+  - path: domains/operational.anchor
+    namespace: OPS
+    required: true
+
+  - path: domains/supply_chain.anchor
+    namespace: SUP
+    required: true
+
+frameworks:
+  - path: frameworks/FINOS_Framework.anchor
+    namespace: FINOS
+    source: "FINOS AI Governance Framework"
+    active: false
+
+  - path: frameworks/OWASP_LLM.anchor
+    namespace: OWASP
+    source: "OWASP LLM Top 10 2025"
+    active: false
+
+  - path: frameworks/NIST_AI_RMF.anchor
+    namespace: NIST
+    source: "NIST AI RMF 1.0"
+    active: false
+
+regulators:
+  - path: government/RBI_Regulations.anchor
+    namespace: RBI
+    source: "RBI FREE-AI Report August 2025"
+    active: false
+
+  - path: government/EU_AI_Act.anchor
+    namespace: EU
+    source: "EU AI Act 2024/1689"
+    active: false
+
+  - path: government/SEBI_Regulations.anchor
+    namespace: SEBI
+    source: "SEBI AI/ML Consultation 2024-2025"
+    active: false
+
+  - path: government/CFPB_Regulations.anchor
+    namespace: CFPB
+    source: "CFPB Regulation B + 2024 Guidance"
+    active: false
+
+  - path: government/FCA_Regulations.anchor
+    namespace: FCA
+    source: "FCA AI Governance Guidance 2024"
+    active: false
+
+  - path: government/SEC_Regulations.anchor
+    namespace: USSEC
+    source: "SEC 2026 Examination Priorities"
+    active: false
+
+policy:
+  path: policy.anchor
+  enforce_raise_only: true
+  allow_custom_rules: true
+  custom_rule_prefix: "INTERNAL"
+
+# ── LEGACY ALIASES ───────────────────────────────────────────
+# V3 → FINOS → V4 domain rule
+# Full chain: ANC-NNN → FINOS-NNN → domain rule
+# FINOS_Framework.anchor is the Rosetta Stone.
+
+legacy_aliases:
+  ANC-001: FINOS-001
+  ANC-002: FINOS-002
+  ANC-003: FINOS-003
+  ANC-004: FINOS-004
+  ANC-005: FINOS-005
+  ANC-006: FINOS-006
+  ANC-007: FINOS-007
+  ANC-008: FINOS-008
+  ANC-009: FINOS-009
+  ANC-010: FINOS-010
+  ANC-011: FINOS-011
+  ANC-012: FINOS-012
+  ANC-013: FINOS-013
+  ANC-014: FINOS-014
+  ANC-015: FINOS-015
+  ANC-016: FINOS-016
+  ANC-017: FINOS-017
+  ANC-018: FINOS-018
+  ANC-019: FINOS-019
+  ANC-020: FINOS-020
+  ANC-021: FINOS-021
+  ANC-022: FINOS-022
+  ANC-023: FINOS-023
+
+
+engine:
+  fail_on: [BLOCKER, ERROR]
+  warn_on: [WARNING]
+  info_on: [INFO]
+  seal_check: strict
+  unknown_namespace: reject
+  suppress_tracking: true
+  suppress_requires_reason: true
+
+output:
+  formats: [json, markdown]
+  report_path: ".anchor/reports/"
+  telemetry_path: ".anchor/telemetry/"
+  include_git_blame: true

@@ -1,0 +1,329 @@
+type: framework
+namespace: FINOS
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+source: "FINOS AI Governance Framework"
+source_url: "https://github.com/finos/ai-governance-framework"
+credit: "FINOS AI Governance Framework Risk Taxonomy (Ri-001 - Ri-023)"
+description: >
+  The FINOS AI Governance Framework provides the foundational risk
+  taxonomy for Anchor. This framework file acts as the primary
+  mapping layer, connecting the original FINOS Ri-IDs and V3 ANC-IDs
+  to the refined V4 Domain-prefixed rules. Use this framework to
+  ensure compliance with the FINOS standard.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "FINOS-001"
+    name: "Prompt Injection"
+    original_id: "Ri-001"
+    maps_to: "SEC-001"
+    severity: "blocker"
+    description: "Malicious instructions injected into prompts."
+    primitives:
+      action: inject
+      object: instructions
+      context: untrusted_prompt
+      authority: external_actor
+      flow: instruction_stack
+
+  - id: "FINOS-002"
+    name: "Data Poisoning"
+    original_id: "Ri-002"
+    maps_to: "SEC-002"
+    severity: "blocker"
+    description: "Poisoning of training, fine-tuning, or retrieval data."
+    primitives:
+      action: corrupt
+      object: training_data
+      context: fine_tuning_pipeline
+      authority: malicious_actor
+      flow: data_pipeline
+
+  - id: "FINOS-003"
+    name: "Model Tampering"
+    original_id: "Ri-003"
+    maps_to: "SEC-003"
+    severity: "blocker"
+    description: "Unauthorized modification of model weights or artifacts."
+    primitives:
+      action: modify
+      object: model_weights
+      context: model_storage
+      authority: unauthorized_actor
+      flow: artifact_mutation
+
+  - id: "FINOS-004"
+    name: "Credential Harvesting"
+    original_id: "Ri-004"
+    maps_to: "SEC-004"
+    severity: "blocker"
+    description: "Systematic exfiltration of secrets via AI pipelines."
+    primitives:
+      action: access
+      object: api_credentials
+      context: environment_variables
+      authority: ai_agent
+      flow: exfiltration_path
+
+  - id: "FINOS-005"
+    name: "Model Leakage and Theft"
+    original_id: "Ri-005"
+    maps_to: "SUP-001"
+    severity: "blocker"
+    description: "Unauthorized export or exfiltration of model weights."
+    primitives:
+      action: expose
+      object: model_weights
+      context: unauthorized_export
+      authority: malicous_actor
+      flow: asset_exfiltration
+
+  - id: "FINOS-006"
+    name: "Weight Corruption"
+    original_id: "Ri-006"
+    maps_to: "SUP-002"
+    severity: "blocker"
+    description: "Accidental or malicious corruption of model weights."
+    primitives:
+      action: replace
+      object: adversarial_variant
+      context: model_artifact_mutation
+      authority: supply_chain_attacker
+      flow: weight_poisoning
+
+  - id: "FINOS-007"
+    name: "Versioning Drift"
+    original_id: "Ri-007"
+    maps_to: "SUP-003"
+    severity: "warning"
+    description: "Undocumented or unverified changes in model versions."
+    primitives:
+      action: operate
+      object: unpinned_model_version
+      context: change_management_failure
+      authority: unauthorized_deployment
+      flow: behavioral_drift
+
+  - id: "FINOS-008"
+    name: "Hallucination"
+    original_id: "Ri-008"
+    maps_to: "ALN-001"
+    severity: "error"
+    description: "Model generating plausible but false or dangerous information."
+    primitives:
+      action: withhold
+      object: truthful_information
+      context: factually_incorrect
+      authority: generative_model
+      flow: output_hallucination
+
+  - id: "FINOS-009"
+    name: "Bias and Discrimination"
+    original_id: "Ri-009"
+    maps_to: "ETH-001"
+    severity: "error"
+    description: "Systematically biased or discriminatory model outcomes."
+    primitives:
+      action: discriminate
+      object: decision_outcomes
+      context: prohibited_proxies
+      authority: predictive_model
+      flow: biased_inference
+
+  - id: "FINOS-010"
+    name: "Explainability Absence"
+    original_id: "Ri-010"
+    maps_to: "ETH-002"
+    severity: "error"
+    description: "Decisions made by black-box models that cannot be explained."
+    primitives:
+      action: withhold
+      object: machine_readable_explanations
+      context: structured_output
+      authority: black_box_model
+      flow: opaque_decisioning
+
+  - id: "FINOS-011"
+    name: "Availability and Denial"
+    original_id: "Ri-011"
+    maps_to: "OPS-001"
+    severity: "error"
+    description: "AI system unavailability due to resource exhaustion or attacks."
+    primitives:
+      action: exhaust
+      object: system_resources
+      context: critical_infrastructure
+      authority: malicious_request_stream
+      flow: denial_of_service
+
+  - id: "FINOS-012"
+    name: "Authorization Bypass"
+    original_id: "Ri-012"
+    maps_to: "SEC-005"
+    severity: "blocker"
+    description: "Executing actions outside granted permissions via AI tools."
+    primitives:
+      action: skip
+      object: permission_checks
+      context: tool_chaining
+      authority: model_agent
+      flow: privilege_escalation
+
+  - id: "FINOS-013"
+    name: "Raw Network Access"
+    original_id: "Ri-013"
+    maps_to: "SEC-006"
+    severity: "error"
+    description: "Unproxied outbound network calls from AI components."
+    primitives:
+      action: egress
+      object: outbound_telemetry
+      context: unproxied_request
+      authority: ai_component
+      flow: direct_network
+
+  - id: "FINOS-014"
+    name: "Shell Injection"
+    original_id: "Ri-014"
+    maps_to: "SEC-007"
+    severity: "blocker"
+    description: "Executing shell commands constructed from untrusted model input."
+    primitives:
+      action: execute
+      object: shell_commands
+      context: untrusted_input
+      authority: sub_process
+      flow: control_flow
+
+  - id: "FINOS-015"
+    name: "PII Leakage"
+    original_id: "Ri-015"
+    maps_to: "PRV-001"
+    severity: "blocker"
+    description: "Unauthorized exposure of Personally Identifiable Information."
+    primitives:
+      action: transmit
+      object: personally_identifiable_info
+      context: third_party_hosted_model
+      authority: unauthorized_data_flow
+      flow: pii_leakage
+
+  - id: "FINOS-016"
+    name: "Vector Inversion"
+    original_id: "Ri-016"
+    maps_to: "PRV-002"
+    severity: "error"
+    description: "Reconstructing training data from embedding vectors."
+    primitives:
+      action: reconstruct
+      object: original_sensitive_data
+      context: embedding_extraction
+      authority: adversarial_inference
+      flow: inversion_attack
+
+  - id: "FINOS-017"
+    name: "Supply Chain Attack"
+    original_id: "Ri-017"
+    maps_to: "SEC-011"
+    severity: "blocker"
+    description: "Compromised upstream dependencies or tool integrations."
+    primitives:
+      action: compromise
+      object: upstream_dependency
+      context: model_repository
+      authority: compromised_vendor
+      flow: supply_chain_flow
+
+  - id: "FINOS-018"
+    name: "Model Overreach"
+    original_id: "Ri-018"
+    maps_to: "SHR-001"
+    severity: "warning"
+    description: "Using models beyond their validated scope or context."
+    primitives:
+      action: repurpose
+      object: unvalidated_model
+      context: mismatch_context
+      authority: unverified_workflow
+      flow: context_drift
+
+  - id: "FINOS-019"
+    name: "Regulatory Non-Compliance"
+    original_id: "Ri-019"
+    maps_to: "LEG-002"
+    severity: "error"
+    description: "AI deployment violating specific jurisdictional laws."
+    primitives:
+      action: violate
+      object: jurisdictional_laws
+      context: undocumented_compliance
+      authority: deploying_organization
+      flow: legal_violation
+
+  - id: "FINOS-020"
+    name: "Human Oversight Removal"
+    original_id: "Ri-020"
+    maps_to: "ETH-003"
+    severity: "blocker"
+    description: "Autonomous decisions made without human-in-the-loop controls."
+    primitives:
+      action: bypass
+      object: human_review
+      context: autonomous_decision
+      authority: agentic_workflow
+      flow: automated_control_loop
+
+  - id: "FINOS-021"
+    name: "Goal Misrepresentation"
+    original_id: "Ri-021"
+    maps_to: "ALN-002"
+    severity: "blocker"
+    description: "Agents pursuing objectives misaligned with user intent."
+    primitives:
+      action: diverge
+      object: declared_purpose
+      context: emergent_behavior
+      authority: autonomous_system
+      flow: misaligned_pursuit
+
+  - id: "FINOS-022"
+    name: "Cross-context Data Bleed"
+    original_id: "Ri-022"
+    maps_to: "PRV-003"
+    severity: "error"
+    description: "Data from one context leaking into another via shared state."
+    primitives:
+      action: contaminate
+      object: user_session_context
+      context: cross_tenant_leakage
+      authority: shared_state_artifact
+      flow: context_bleeding
+
+  - id: "FINOS-023"
+    name: "IP Infringement"
+    original_id: "Ri-023"
+    maps_to: "LEG-001"
+    severity: "warning"
+    description: "Model outputs infringing on intellectual property or copyright."
+    primitives:
+      action: reproduce
+      object: copyrighted_material
+      context: training_data_overlap
+      authority: generative_model
+      flow: ip_infringement_flow
+
+  - id: "FINOS-024"
+    name: "Governance Config Modification"
+    original_id: "Ri-024"
+    maps_to: "SEC-012"
+    severity: "blocker"
+    description: "Unrestricted modification of governance configuration by unauthorised actors."
+    primitives:
+      action: modify
+      object: governance_configuration
+      context: unrestricted
+      authority: unauthorised_actor
+      flow: direct_mutation

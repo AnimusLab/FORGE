@@ -5,3 +5,10 @@ forge.toml
 forge.wal
 forge.toml
 forge.wal
+
+# Anchor governance cache/logs
+.anchor/cache/
+.anchor/logs/*.tmp
+.anchor/policy.anchor
+.anchor/forge_policy.anchor  
+.env 

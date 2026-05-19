@@ -1,0 +1,51 @@
+type: domain
+namespace: ALN
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+always_loaded: false
+description: >
+  Alignment violations in AI systems. Covers hallucination of
+  non-existent APIs and code references, and goal misrepresentation
+  where AI output diverges from declared system purpose.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "ALN-001"
+    name: "Hallucination"
+    source: "FINOS"
+    original_id: "Ri-008"
+    category: "accuracy"
+    description: >
+      AI models generate factually incorrect or non-existent information.
+    severity: "error"
+    min_severity: "warning"
+    runtime_pattern: '(?i)(I apologize|not found|fabricated|fictitious|error 404|non-existent)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: withhold
+      object: truthful_information
+      context: factually_incorrect
+      authority: generative_model
+      flow: output_hallucination
+
+  - id: "ALN-002"
+    name: "Goal Misrepresentation"
+    source: "FINOS"
+    original_id: "Ri-021"
+    category: "safety"
+    description: >
+      An AI system pursues objectives that diverge from its declared purpose.
+    severity: "blocker"
+    min_severity: "error"
+    runtime_pattern: '(?i)(diverge|misaligned|emergent behavior|optimize for|unintended)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: diverge
+      object: declared_purpose
+      context: emergent_behavior
+      authority: autonomous_system
+      flow: misaligned_pursuit

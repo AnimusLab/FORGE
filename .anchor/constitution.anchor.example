@@ -1,0 +1,222 @@
+# constitution.anchor.example
+# ─────────────────────────────────────────────────────────────
+# ANCHOR V4 — CONSTITUTION MANIFEST TEMPLATE
+# ─────────────────────────────────────────────────────────────
+#
+# This file is a REFERENCE ONLY.
+# The actual constitution.anchor lives inside the Anchor package
+# and is maintained by Anchor Core. You do not edit it.
+#
+# What this file shows you:
+#   - Which domains and frameworks are available
+#   - How the manifest controls what gets loaded
+#   - What the legacy alias chain looks like
+#   - How to read the engine configuration
+#
+# To activate additional domains or frameworks, run:
+#   anchor init --domains privacy,alignment,legal
+#   anchor init --frameworks rbi,eu,sebi
+#   anchor init --domains all --frameworks all
+#
+# ─────────────────────────────────────────────────────────────
+
+type: manifest
+version: "4.0"
+anchor_version: ">=4.0.0"
+name: "Anchor Constitutional Root"
+sealed: true
+seal: "sha256:PENDING"
+
+# ── CORE DOMAINS ─────────────────────────────────────────────
+# Always loaded. Cannot be removed. These are the floor.
+# Covers the most critical AI risks across all deployments.
+
+core_domains:
+  - path: domains/security.anchor
+    namespace: SEC
+    required: true
+    # SEC-001 Prompt Injection
+    # SEC-002 Data Poisoning
+    # SEC-003 Model Tampering
+    # SEC-004 Credential Harvesting
+    # SEC-005 Authorization Bypass
+    # SEC-006 Raw Network Access
+    # SEC-007 Shell Injection
+    # SEC-008 Supply Chain Attack
+
+  - path: domains/ethics.anchor
+    namespace: ETH
+    required: true
+    # ETH-001 Bias and Discrimination
+    # ETH-002 Explainability Absence
+    # ETH-003 Human Oversight Removal
+    # ETH-004 Toxic Output
+
+  - path: domains/shared.anchor
+    namespace: SHR
+    required: true
+    # SHR-001 Model Overreach and Expanded Use
+    # SHR-002 Data Quality and Model Drift
+    # SHR-003 Reputational and Conduct Risk
+
+# ── ACTIVE DOMAINS ───────────────────────────────────────────
+# Opt-in. Loaded when requested via anchor init --domains.
+# Comment out any domain your system does not need.
+
+active_domains:
+  - path: domains/privacy.anchor
+    namespace: PRV
+    # PRV-001 PII Leakage to Hosted Model
+    # PRV-002 Vector Inversion Attack
+    # PRV-003 Cross-context Data Bleed
+
+  - path: domains/alignment.anchor
+    namespace: ALN
+    # ALN-001 Hallucination
+    # ALN-002 Goal Misrepresentation
+
+  - path: domains/legal.anchor
+    namespace: LEG
+    # LEG-001 IP Infringement
+    # LEG-002 Regulatory Non-Compliance
+
+  - path: domains/operational.anchor
+    namespace: OPS
+    # OPS-001 Availability and Denial
+
+  - path: domains/supply_chain.anchor
+    namespace: SUP
+    # SUP-001 Model Leakage and Theft
+    # SUP-002 Weight Corruption
+    # SUP-003 Versioning Drift
+
+  - path: domains/agentic.anchor
+    namespace: AGT
+    # AGT-001 Agent Action Authorization Bypass
+    # AGT-002 Tool Chain Manipulation and Injection
+    # AGT-003 MCP Server Supply Chain Compromise
+    # AGT-004 Agent State Persistence Poisoning
+    # AGT-005 Multi-Agent Trust Boundary Violations
+
+# ── FRAMEWORK FILES ──────────────────────────────────────────
+# Absorbed third-party standards. Opt-in.
+# Each framework loads under its own namespace.
+# Standards bodies: FINOS, OWASP, NIST
+# Government regulators: RBI, EU, SEBI, CFPB, FCA, SEC
+
+frameworks:
+  - path: frameworks/FINOS_Framework.anchor
+    namespace: FINOS
+    source: "FINOS AI Governance Framework"
+    active: true
+    # FINOS is the Rosetta Stone — maps ANC-NNN → FINOS-NNN → domain rule
+
+  - path: frameworks/OWASP_LLM.anchor
+    namespace: OWASP
+    source: "OWASP LLM Top 10 2025"
+    active: false
+    # Enable for OWASP LLM Top 10 compliance mapping
+
+  - path: frameworks/NIST_AI_RMF.anchor
+    namespace: NIST
+    source: "NIST AI RMF 1.0"
+    active: false
+    # Enable for NIST AI Risk Management Framework coverage
+
+  - path: government/RBI_Regulations.anchor
+    namespace: RBI
+    source: "RBI FREE-AI Report August 2025"
+    active: false
+    # Enable if you are a regulated entity under RBI jurisdiction
+    # Covers all 26 FREE-AI recommendations
+
+  - path: government/EU_AI_Act.anchor
+    namespace: EU
+    source: "EU AI Act 2024/1689"
+    active: false
+    # Enable if deploying high-risk AI in EU markets
+    # Full enforcement August 2, 2026. Fines up to 6% global revenue.
+
+  - path: government/SEBI_Regulations.anchor
+    namespace: SEBI
+    source: "SEBI AI/ML Consultation 2024-2025"
+    active: false
+    # Enable if you are a SEBI-regulated market participant
+
+  - path: government/CFPB_Regulations.anchor
+    namespace: CFPB
+    source: "CFPB Regulation B + 2024 Guidance"
+    active: false
+    # Enable for US credit/lending AI. Covers adverse action requirements.
+
+  - path: government/FCA_Regulations.anchor
+    namespace: FCA
+    source: "FCA AI Governance Guidance 2024"
+    active: false
+    # Enable if FCA regulated. CCO personal liability from Sept 2026.
+
+  - path: government/SEC_Regulations.anchor
+    namespace: USSEC
+    source: "SEC 2026 Examination Priorities"
+    active: false
+    # Enable for SEC-registered investment advisers and broker-dealers
+
+# ── POLICY FILE ──────────────────────────────────────────────
+# Your org's private override layer.
+# Can only raise severity or add INTERNAL-* rules.
+# Engine rejects any override that lowers severity.
+
+policy:
+  path: policy.anchor
+  enforce_raise_only: true
+  allow_custom_rules: true
+  custom_rule_prefix: "INTERNAL"
+
+# ── LEGACY ALIASES ───────────────────────────────────────────
+# V3 backward compatibility.
+# Full chain: ANC-NNN → FINOS-NNN → domain rule
+# FINOS_Framework.anchor is the Rosetta Stone.
+
+legacy_aliases:
+  ANC-001: FINOS-001    # → SEC-006  Raw Network Access
+  ANC-002: FINOS-002    # → PRV-002  Vector Inversion
+  ANC-003: FINOS-003    # → ALN-001  Hallucination
+  ANC-004: FINOS-004    # → SUP-003  Versioning Drift
+  ANC-005: FINOS-005    # → ALN-001  Non-Deterministic Behaviour
+  ANC-006: FINOS-006    # → OPS-001  Availability
+  ANC-007: FINOS-007    # → SEC-003  Model Tampering
+  ANC-008: FINOS-008    # → SEC-002  Data Poisoning
+  ANC-009: FINOS-009    # → SEC-001  Prompt Injection
+  ANC-010: FINOS-010    # → ALN-002  Goal Misrepresentation
+  ANC-011: FINOS-011    # → ETH-001  Bias
+  ANC-012: FINOS-012    # → ETH-002  Explainability Absence
+  ANC-013: FINOS-013    # → SHR-001  Model Overreach
+  ANC-014: FINOS-014    # → SHR-002  Data Quality and Drift
+  ANC-015: FINOS-015    # → SHR-003  Reputational Risk
+  ANC-016: FINOS-016    # → LEG-002  Regulatory Non-Compliance
+  ANC-017: FINOS-017    # → LEG-001  IP Infringement
+  ANC-018: FINOS-018    # → AGT-001  Agent Authorization Bypass
+  ANC-019: FINOS-019    # → AGT-002  Tool Chain Manipulation
+  ANC-020: FINOS-020    # → AGT-003  MCP Compromise
+  ANC-021: FINOS-021    # → AGT-004  State Persistence Poisoning
+  ANC-022: FINOS-022    # → AGT-005  Multi-Agent Trust Violations
+  ANC-023: FINOS-023    # → SEC-004  Credential Harvesting
+
+# ── ENGINE CONFIGURATION ─────────────────────────────────────
+
+engine:
+  fail_on: [BLOCKER, ERROR]       # severities that fail the audit
+  warn_on: [WARNING]              # severities that pass but log
+  info_on: [INFO]                 # informational only
+  seal_check: strict              # strict | warn | off
+  unknown_namespace: reject       # reject | warn | ignore
+  suppress_tracking: true         # track all # anchor: ignore usage
+  suppress_requires_reason: true  # require reason with suppression
+
+# ── OUTPUT CONFIGURATION ─────────────────────────────────────
+
+output:
+  formats: [json, markdown]
+  report_path: ".anchor/reports/"
+  telemetry_path: ".anchor/telemetry/"
+  include_git_blame: true

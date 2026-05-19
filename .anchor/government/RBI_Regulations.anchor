@@ -1,0 +1,354 @@
+type: framework
+namespace: RBI
+version: "2025-08"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+opt_in: true
+source: "RBI Framework for Responsible and Ethical Enablement of AI (FREE-AI)"
+source_url: "https://rbidocs.rbi.org.in/rdocs/PublicationReport/Pdfs/FREEAIR130820250A24FF2D4578453F824C72ED9F5D5851.PDF"
+source_date: "August 13, 2025"
+credit: >
+  The Reserve Bank of India FREE-AI Report (August 2025) issued 26
+  mandatory recommendations for AI deployed in financial services,
+  structured around 7 sutras and 6 strategic pillars. This framework
+  file maps those recommendations to Anchor enforcement mechanisms.
+  Full report: RBI Expert Committee on FREE-AI, August 2025.
+layer_2_status: >
+  Rules marked obligation_type: provenance, audit, or disclosure
+  depend on AnchorRuntime (Layer 2) and the Decision Audit Chain (DAC).
+  Layer 2 is currently in development. These rules are specified as
+  designed and will be enforced once Layer 2 ships.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "RBI-006"
+    name: "Board-Approved AI Policy"
+    original_id: "Recommendation 6"
+    maps_to: "LEG-002"
+    obligation_type: disclosure
+    anchor_mechanism: >
+      constitution.anchor + policy.anchor as the machine-readable
+      board-approved policy artifact. anchor audit --report generates
+      the compliance disclosure document.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      Every regulated entity must formulate a board-approved AI policy
+      covering adoption areas, risk appetite, governance framework,
+      and periodic review mechanism. Board-level accountability is
+      mandatory and cannot be delegated to vendors or technical teams.
+      Anchor's sealed constitution.anchor and policy.anchor together
+      constitute the machine-readable equivalent of this policy —
+      cryptographically signed, version-controlled, and auditable.
+    primitives:
+      action: formulate
+      object: board_approved_policy
+      context: regulatory_compliance
+      authority: regulated_entity
+      flow: disclosure_flow
+
+  - id: "RBI-007"
+    name: "Per-Decision Audit Trail — CIMS Reportable"
+    original_id: "Recommendation 7"
+    maps_to: "DAC-AuditEntry"
+    obligation_type: provenance
+    anchor_mechanism: >
+      DAC AuditEntry chain with cims_payload() method. Every AI
+      decision produces an AuditEntry with entry_id, timestamp,
+      model_id, model_version, input_hash, output_hash, violations,
+      risk_level, chain_hash, and signature. cims_payload() serializes
+      to RBI CIMS-reportable JSON on demand. Layer 2 in development.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      Documented audit trail per AI decision must be maintained and
+      reportable to the RBI CIMS portal on demand. This is the core
+      enforcement mechanism for AI governance in lending and credit
+      decisions. The RBI has no fine ceiling for non-compliance with
+      this requirement. Every AI-assisted decision — credit approval,
+      fraud flag, customer service routing — must have a corresponding
+      audit record that proves what the model decided, on what input,
+      at what version, under which governance rules.
+    primitives:
+      action: maintain
+      object: audit_trail_record
+      context: credit_decision_context
+      authority: decision_audit_chain
+      flow: cims_telemetry_flow
+
+  - id: "RBI-009"
+    name: "AI Liability Framework — Non-Transferable"
+    original_id: "Recommendation 9"
+    maps_to: "DAC-AuditEntry"
+    obligation_type: provenance
+    anchor_mechanism: >
+      chain_hash + signature in AuditEntry provides cryptographic
+      non-repudiation. The deploying RE's AuditEntry proves ownership
+      of every AI decision — vendor liability cannot be claimed when
+      the decision chain is signed by the RE's key. Layer 2 in development.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      Regulatory entities are accountable for the consequences of
+      every AI decision they deploy, regardless of whether the model
+      was built by a third-party vendor. Vendor liability does not
+      transfer — CFPB, FCA, and RBI have all confirmed this explicitly.
+      The RE that deploys the model owns every decision that model makes.
+      Anchor's cryptographic audit chain provides the non-repudiation
+      proof that establishes this ownership — if your key signed the
+      AuditEntry, you own the decision.
+    primitives:
+      action: sign
+      object: decision_audit_entry
+      context: non_repudiation_context
+      authority: deploying_re_key
+      flow: liability_ownership_flow
+
+  - id: "RBI-012"
+    name: "Regulator Query Access to Audit Chain"
+    original_id: "Recommendation 12"
+    maps_to: "DAC-AuditLog"
+    obligation_type: audit
+    anchor_mechanism: >
+      DAC AuditLog.verify_chain() method and /audit API endpoint
+      expose the full tamper-evident audit chain for regulator
+      inspection in real time. Layer 2 in development.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      RBI must be able to build internal AI expertise and conduct
+      supervisory review of AI systems deployed by regulated entities.
+      This requires that audit trails be queryable by the regulator
+      — not just internally logged. Anchor's /audit endpoint exposes
+      the full DAC chain for regulator inspection, with verify_chain()
+      providing real-time tamper detection. A regulator can verify
+      the integrity of the entire audit history in a single API call.
+    primitives:
+      action: expose
+      object: tamper_evident_audit_chain
+      context: supervisory_review
+      authority: supervisory_authority
+      flow: real_time_inspection_egress
+
+  - id: "RBI-014"
+    name: "AI Credit Decisions — Explainability Mandatory"
+    original_id: "Recommendation 14"
+    maps_to: "ETH-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-002 explainability absence violation fires on black-box
+      credit decision code. adverse_action_reasons() method on
+      AuditEntry produces CFPB and RBI compliant reason codes.
+      CREDIT-001 violation fires when denial output has no reason
+      code field. Layer 1 detection active now.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      AI-assisted credit decisions must be explainable and auditable
+      through the CIMS portal. Specific reason codes are required for
+      every adverse action. The RBI explicitly rejects the position
+      that algorithmic complexity is a valid reason for opaque decisions.
+      Goldman Sachs paid $45M to the CFPB in October 2024 for exactly
+      this failure — an AI credit model that could not explain its
+      decisions at the individual decision level. The same enforcement
+      logic applies under RBI mandate for Indian regulated entities.
+    primitives:
+      action: explain
+      object: adverse_action_outcome
+      context: credit_decision_context
+      authority: generative_model
+      flow: reason_code_egress
+
+  - id: "RBI-015"
+    name: "Data Lifecycle Governance Framework"
+    original_id: "Recommendation 15"
+    maps_to: "PRV-001"
+    obligation_type: detection
+    anchor_mechanism: >
+      PRV-001 PII leakage detection active in Layer 1. DATA-*
+      violation category covers data governance gaps. PROV-003
+      provenance violation fires when AI output has no data
+      lineage metadata. Layer 1 detection active now.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      Regulated entities must implement data governance practices
+      covering collection, storage, processing, and deletion of data
+      used in AI systems. Must align with DPDP Act 2023. Data lineage
+      is mandatory — every AI output must be traceable back to the
+      data sources that influenced it. This requirement is not
+      satisfied by policy documents — it requires technical controls
+      that can be demonstrated to a regulator.
+    primitives:
+      action: trace
+      object: data_lineage_metadata
+      context: dpdp_act_compliance
+      authority: data_governance_framework
+      flow: lineage_provenance_flow
+
+  - id: "RBI-017"
+    name: "Product Approval Process for AI Features"
+    original_id: "Recommendation 17"
+    maps_to: "LEG-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      anchor check in CI/CD pipeline acts as the technical gate
+      in the product approval process. A failing audit blocks
+      deployment. The violation report is the governance sign-off
+      artifact. Layer 1 active now.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      Product approval processes must be expanded to include
+      AI-related aspects. Any product using AI in customer-facing
+      decisions requires governance sign-off before launch. Running
+      anchor check as a required CI/CD step satisfies this requirement
+      technically — a passing audit with zero BLOCKER or ERROR
+      violations constitutes the governance gate that must be cleared
+      before deployment.
+    primitives:
+      action: gate
+      object: ai_deployment_artifact
+      context: product_approval_process
+      authority: governance_enforcer
+      flow: ci_cd_blocking_flow
+
+  - id: "RBI-018"
+    name: "Cybersecurity Augmentation — AI-Specific Threats"
+    original_id: "Recommendation 18"
+    maps_to: ["SEC-001", "SEC-007"]
+    obligation_type: detection
+    anchor_mechanism: >
+      SEC-001 prompt injection, SEC-002 data poisoning, SEC-003
+      model tampering, AGT-003 MCP compromise all fire in Layer 1
+      static analysis. Full coverage of AI-specific cybersecurity
+      threats listed in RBI FREE-AI Pillar 5.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      The RBI Cyber Security Framework must be extended to cover
+      AI-specific risks including model poisoning, adversarial attacks,
+      prompt injection, and AI incident reporting protocols. These
+      are not hypothetical risks — they are active attack vectors
+      against financial AI systems. Anchor's SEC- and AGT- domain
+      rules provide the technical detection layer for every
+      AI-specific cybersecurity threat enumerated in FREE-AI Pillar 5.
+    primitives:
+      action: detect
+      object: ai_specific_cyber_threat
+      context: rbi_cyber_security_framework
+      authority: security_orchestration
+      flow: incident_detection_flow
+
+  - id: "RBI-019"
+    name: "Algorithmic Fairness Audits — Mandatory"
+    original_id: "Recommendation 19"
+    maps_to: "ETH-001"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-001 bias and discrimination detection active in Layer 1.
+      BIAS-* violation category fires on protected attribute usage
+      in feature vectors and decision outputs.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      Regular algorithmic fairness audits are mandatory for AI systems
+      used in credit, lending, and customer decisions. Bias monitoring
+      and bias testing are not optional best practices — they are
+      regulatory obligations. Running anchor check with ETH-001 active
+      constitutes the technical layer of this audit obligation.
+      The audit report generated by anchor audit --report provides
+      the documented evidence of fairness testing that regulators
+      can inspect.
+    primitives:
+      action: audit
+      object: protected_attribute_usage
+      context: mandatory_fairness_assessment
+      authority: generative_model
+      flow: bias_reporting_egress
+
+  - id: "RBI-024"
+    name: "AI Inventory — Supervisory Inspection"
+    original_id: "Recommendation 24"
+    maps_to: "DAC-AuditEntry"
+    obligation_type: provenance
+    anchor_mechanism: >
+      model_version + model_id in every AuditEntry constitutes the
+      AI inventory record per decision. SUP-003 versioning drift
+      violation fires when model version is undeclared or inconsistent.
+      Layer 2 in development.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      Regulated entities must maintain an AI inventory of all deployed
+      models, use cases, dependencies, and risk profiles — available
+      for supervisory inspection at any time. Anchor's AuditEntry
+      records model_id and model_version per decision, creating a
+      continuous, tamper-evident inventory of every model that has
+      made a decision. This is not a static spreadsheet — it is a
+      live, cryptographically signed record of every AI system in
+      production.
+    primitives:
+      action: maintain
+      object: model_inventory_record
+      context: supervisory_inspection
+      authority: automated_discovery_agent
+      flow: continuous_inventory_flow
+
+  - id: "RBI-025"
+    name: "Risk-Based AI Audit Framework"
+    original_id: "Recommendation 25"
+    maps_to: "DAC-AuditLog"
+    obligation_type: audit
+    anchor_mechanism: >
+      anchor audit command produces the internal audit artifact.
+      DAC verify_chain() provides tamper-evident audit chain for
+      third-party auditors. /audit endpoint exposes the chain for
+      independent audit firms. anchor audit --report generates
+      the biannual audit report artifact. Layer 2 in development
+      for full DAC audit support.
+    severity: "blocker"
+    min_severity: "error"
+    description: >
+      Internal audits must be proportional to AI risk level.
+      Independent third-party audits are required for high-risk
+      or complex AI use cases. The audit framework must be reviewed
+      and updated biannually to incorporate emerging risks and
+      regulatory developments. Anchor satisfies the technical audit
+      requirement — the violation report, DAC chain, and verify_chain()
+      output constitute the audit artifacts that internal and external
+      auditors consume.
+    primitives:
+      action: verify
+      object: audit_history_integrity
+      context: independent_third_party_audit
+      authority: audit_verification_service
+      flow: audit_chain_attestation
+
+  - id: "RBI-026"
+    name: "Mandatory AI Disclosures and Compliance Toolkit"
+    original_id: "Recommendation 26"
+    maps_to: "LEG-002"
+    obligation_type: disclosure
+    anchor_mechanism: >
+      anchor audit --report generates the JSON and Markdown compliance
+      report that feeds annual disclosure requirements. The sealed
+      constitution.anchor SHA-256 hash provides the cryptographic
+      attestation of the compliance toolkit.
+    severity: "error"
+    min_severity: "warning"
+    description: >
+      Regulated entities must include AI governance disclosures in
+      annual reports covering AI governance frameworks, adoption areas,
+      consumer protection measures, and grievance redressal mechanisms.
+      Anchor's audit report output provides the structured compliance
+      evidence that feeds these disclosures. The constitution.anchor
+      seal provides cryptographic proof that the governance framework
+      was active and enforced during the reporting period.
+    primitives:
+      action: report
+      object: annual_governance_disclosure
+      context: capital_markets_reporting
+      authority: registered_entity
+      flow: compliance_disclosure_flow

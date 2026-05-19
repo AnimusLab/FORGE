@@ -1,0 +1,140 @@
+type: framework
+namespace: CFPB
+version: "2024"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+opt_in: true
+source: "CFPB Regulation B (Equal Credit Opportunity Act) and 2024 AI Guidance"
+source_url: "https://www.consumerfinance.gov/compliance/circulars/"
+source_date: "2024"
+credit: >
+  Consumer Financial Protection Bureau Regulation B implementing
+  the Equal Credit Opportunity Act (ECOA), and CFPB 2024 guidance
+  on adverse action notification requirements for AI-assisted credit
+  decisions. The $45 million enforcement action against Goldman Sachs
+  in October 2024 established the enforcement precedent for AI credit
+  model explainability obligations in US financial services.
+layer_2_status: >
+  Rules marked obligation_type: provenance depend on AnchorRuntime
+  (Layer 2) and the Decision Audit Chain (DAC). Layer 2 is currently
+  in development.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "CFPB-001"
+    name: "Adverse Action Notice — Specific Reasons Required"
+    original_id: "Regulation B, Section 202.9"
+    maps_to: "ETH-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-002 explainability absence fires on credit decision code
+      without reason codes. CREDIT-001 violation fires specifically
+      on denial output with no reason_code field. adverse_action_reasons()
+      method on AuditEntry produces ECOA-compliant reason codes.
+      Layer 1 detection active now.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      Creditors must provide applicants with specific, principal
+      reasons for adverse action taken on credit applications. The
+      CFPB explicitly rejects the position that algorithmic complexity
+      justifies opaque denials — the reasons must be specific,
+      comprehensible, and accurate. Goldman Sachs paid $45 million
+      in October 2024 not because their Apple Card AI model was
+      wrong, but because they could not explain at the individual
+      decision level why the algorithm reached its conclusions.
+      This is the most directly enforced AI compliance obligation
+      in US financial services.
+    primitives:
+      action: explain
+      object: principal_reasons_for_denial
+      context: credit_application_context
+      authority: generative_model
+      flow: adverse_action_egress
+
+  - id: "CFPB-002"
+    name: "AI Credit Models — Algorithm Not an Excuse"
+    original_id: "CFPB Circular 2024"
+    maps_to: "ETH-002"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-002 explainability absence detection. CREDIT-001 fires
+      on denial without reason code. ADV-001 fires on adverse
+      action without violation_id linkage. Layer 1 active now.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      CFPB 2024 guidance explicitly extends Regulation B to
+      AI-assisted credit decisions. The use of a complex AI model
+      does not exempt creditors from providing specific reasons
+      for adverse action. The model's complexity is the creditor's
+      problem, not the applicant's. Any creditor that cannot
+      explain its AI credit decisions at the individual level
+      is in violation of Regulation B regardless of the model's
+      technical architecture.
+    primitives:
+      action: explain
+      object: individual_decision_level
+      context: Regulation_B_compliance
+      authority: generative_model
+      flow: reasoning_code_trace
+
+  - id: "CFPB-003"
+    name: "Prohibited Basis Discrimination — ECOA Enforcement"
+    original_id: "ECOA Section 701, Regulation B Section 202.4"
+    maps_to: "ETH-001"
+    obligation_type: detection
+    anchor_mechanism: >
+      ETH-001 bias and discrimination detection active in Layer 1.
+      BIAS-001 fires on protected class reference in credit output.
+      BIAS-* violation category covers all ECOA protected characteristics:
+      race, color, religion, national origin, sex, marital status,
+      age, public assistance income.
+    severity: "blocker"
+    min_severity: "blocker"
+    description: >
+      ECOA prohibits credit discrimination based on race, color,
+      religion, national origin, sex, marital status, age, or
+      receipt of public assistance income. AI systems that produce
+      disparate impact on protected classes violate ECOA even
+      without discriminatory intent. The Fair Housing Act extends
+      these protections to mortgage and housing-related credit.
+      Disparate impact is measured against outcomes, not intent —
+      a facially neutral AI model that produces systematically
+      worse outcomes for protected groups is a ECOA violation
+      regardless of how it was designed.
+    primitives:
+      action: discriminate
+      object: decision_outcome
+      context: disparate_impact_context
+      authority: predictive_model
+      flow: biased_inference
+
+  - id: "CFPB-004"
+    name: "Model Risk Management — Documented Validation"
+    original_id: "CFPB Supervisory Guidance 2024"
+    maps_to: "LEG-002"
+    obligation_type: audit
+    anchor_mechanism: >
+      anchor audit pre-deployment produces validation evidence.
+      Violation taxonomy as documented validation artifact.
+      DAC audit chain as ongoing monitoring record. Layer 2
+      in development for full monitoring support.
+    severity: "error"
+    min_severity: "error"
+    description: >
+      CFPB 2024 guidance requires that AI credit models be
+      validated, documented, and subject to ongoing monitoring.
+      Validation results must be available for supervisory
+      examination. Backtesting and performance monitoring are
+      required throughout the model lifecycle — not just at
+      initial deployment. Model risk management for AI credit
+      models is subject to the same supervisory scrutiny as
+      traditional statistical models under OCC SR 11-7.
+    primitives:
+      action: validate
+      object: AI_credit_model
+      context: ongoing_monitoring
+      authority: supervisory_guidance
+      flow: validation_artifact_egress

@@ -1,0 +1,70 @@
+type: domain
+namespace: SUP
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+always_loaded: false
+description: >
+  Supply chain violations in AI systems. Covers model leakage and
+  theft, weight corruption, and versioning drift across the AI
+  model supply chain.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "SUP-001"
+    name: "Model Leakage and Theft"
+    source: "FINOS"
+    original_id: "Ri-005"
+    category: "robustness"
+    description: >
+      Proprietary AI model weights or architectures are exposed.
+    severity: "blocker"
+    min_severity: "blocker"
+    runtime_pattern: '(?i)(model weights|architecture|fine-tuning data|extract|reconstruct|reverse-engineer|api query limit)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: expose
+      object: model_weights
+      context: unauthorized_export
+      authority: malicous_actor
+      flow: asset_exfiltration
+
+  - id: "SUP-002"
+    name: "Weight Corruption"
+    source: "FINOS"
+    original_id: "Ri-006"
+    category: "robustness"
+    description: >
+      AI model weights are corrupted or replaced with adversarial variants.
+    severity: "blocker"
+    min_severity: "error"
+    runtime_pattern: '(?i)(corrupt|modified|adversarial variant|poisoned artifact|backdoor trigger|malicious weight)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: replace
+      object: adversarial_variant
+      context: model_artifact_mutation
+      authority: supply_chain_attacker
+      flow: weight_poisoning
+
+  - id: "SUP-003"
+    name: "Versioning Drift"
+    source: "FINOS"
+    original_id: "Ri-007"
+    category: "operations"
+    description: >
+      AI models deployed operate on unpinned or undocumented versions.
+    severity: "warning"
+    min_severity: "info"
+    runtime_pattern: '(?i)(unpinned|undocumented version|behavioral change|drift|untracked version|change management failure)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: operate
+      object: unpinned_model_version
+      context: change_management_failure
+      authority: unauthorized_deployment
+      flow: behavioral_drift

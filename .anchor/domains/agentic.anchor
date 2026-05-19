@@ -1,0 +1,196 @@
+type: domain
+namespace: AGT
+version: "1.0"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+always_loaded: false
+description: >
+  Agentic AI risks unique to autonomous, tool-calling, and
+  multi-agent systems. These risks operate at the intent and
+  reasoning layer — structurally distinct from code-level
+  security violations. Enable this domain for any system
+  deploying AI agents, MCP integrations, autonomous pipelines,
+  or multi-agent orchestration frameworks.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "AGT-001"
+    name: "Agent Action Authorization Bypass"
+    source: "FINOS"
+    original_id: "Ri-024"
+    category: "security"
+    description: >
+      An AI agent executes actions outside its granted permissions
+      not because a code-level permission check failed, but because
+      the agent's reasoning layer decided to act without consulting
+      the enforcement layer at all. This is a failure of intent, not
+      enforcement. A standard authorization bypass (SEC-005) occurs
+      when code skips a token validation check. An agentic
+      authorization bypass occurs when the model decides that a
+      high-stakes action — transferring funds, modifying governance
+      configuration, calling a privileged API — is within its mandate
+      based on its interpretation of high-level instructions, bypassing
+      the human authorization step entirely. In financial AI, this
+      risk is critical in any agentic system with access to payment
+      rails, customer account operations, or trading systems. The
+      mitigation is not better code-level permission checks — it is
+      explicit intent boundaries declared in the agent's system prompt,
+      enforced by a runtime governance layer that intercepts tool calls
+      before execution and validates them against the agent's declared
+      permission scope.
+    severity: "blocker"
+    min_severity: "blocker"
+    runtime_pattern: '(?i)(bypass|override|admin|root|sudo|unauthorized|permissions)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: execute
+      object: unauthorized_action
+      context: intent_failure
+      authority: agentic_reasoning
+      flow: bypass_enforcement
+
+  - id: "AGT-002"
+    name: "Tool Chain Manipulation and Injection"
+    source: "FINOS"
+    original_id: "Ri-025"
+    category: "security"
+    description: >
+      An attacker manipulates the parameters, outputs, or metadata
+      of tools called by an AI agent to corrupt the agent's reasoning,
+      redirect its actions, or inject malicious instructions into the
+      tool-calling chain. Unlike prompt injection (SEC-001) which
+      targets the model's input, tool chain manipulation targets the
+      feedback loop between the model and its tools — the attacker
+      poisons what the tools return, causing the model to take
+      attacker-controlled actions based on fabricated tool results.
+      In financial AI, tool chain manipulation can cause an agent
+      with access to market data APIs, customer databases, or payment
+      systems to act on falsified data — executing trades based on
+      injected price feeds, approving transactions based on fabricated
+      credit scores, or exfiltrating customer data through manipulated
+      search tool responses. The attack surface grows with every tool
+      the agent can call, and the sophistication required is lower
+      than direct model manipulation because tool outputs are often
+      trusted implicitly by the model's reasoning.
+    severity: "blocker"
+    min_severity: "error"
+    runtime_pattern: '(?i)(tool output|fabricated|interceptor|poisoned tool)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: manipulate
+      object: tool_chain_feedback
+      context: poisoned_feedback_loop
+      authority: external_attacker
+      flow: corrupted_reasoning
+
+  - id: "AGT-003"
+    name: "MCP Server Supply Chain Compromise"
+    source: "FINOS"
+    original_id: "Ri-026"
+    category: "security"
+    description: >
+      A compromised or malicious Model Context Protocol (MCP) server
+      poisons an AI agent's reasoning by returning fabricated tool
+      schemas, injecting malicious instructions into tool descriptions,
+      or providing attacker-controlled responses that redirect the
+      agent's behavior. This is structurally distinct from general
+      supply chain attacks (SEC-008) which target model weights and
+      code dependencies. MCP compromise targets the live reasoning
+      layer — the server that tells the agent what tools exist, what
+      they do, and what they return. A malicious MCP server can
+      convince an agent that a destructive action is a routine
+      operation by manipulating the tool's description and expected
+      output schema. In financial AI deployments using MCP for
+      integration with banking APIs, payment systems, or regulatory
+      reporting tools, a compromised MCP server represents a single
+      point of failure that can redirect an entire agent fleet.
+      Mitigation requires cryptographic verification of MCP server
+      manifests and tool schemas before the agent is permitted to
+      call any tool from that server.
+    severity: "blocker"
+    min_severity: "error"
+    runtime_pattern: '(?i)(mcp server|manifest|tool schema|protocol error)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: poison
+      object: tool_schemas
+      context: compromised_mcp_server
+      authority: malicious_integrated_service
+      flow: reasoning_redirection
+
+  - id: "AGT-004"
+    name: "Agent State Persistence Poisoning"
+    source: "FINOS"
+    original_id: "Ri-027"
+    category: "security"
+    description: >
+      An attacker injects malicious instructions, false memories, or
+      behavioral backdoors into an AI agent's persistent state —
+      long-term memory, conversation history, vector store entries,
+      or cached reasoning chains — causing the agent to carry
+      compromised behavior across sessions, tasks, and restarts.
+      State persistence poisoning is uniquely dangerous because it
+      survives model redeployment. A poisoned memory entry that
+      causes an agent to trust a specific external endpoint, bypass
+      a specific check, or misclassify a specific pattern will
+      continue to affect agent behavior until the state is explicitly
+      audited and purged. In financial AI, agents with persistent
+      state and access to customer data, payment systems, or
+      compliance workflows represent a critical attack surface —
+      a single successful state poisoning event can introduce
+      a long-lived backdoor that operates silently across thousands
+      of subsequent transactions before detection.
+    severity: "error"
+    min_severity: "warning"
+    runtime_pattern: '(?i)(persistent state|memory|vector store|long-term memory)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: inject
+      object: persistent_memory
+      context: behavioral_backdoor
+      authority: adversarial_actor
+      flow: long_term_compromise
+
+  - id: "AGT-005"
+    name: "Multi-Agent Trust Boundary Violations"
+    source: "FINOS"
+    original_id: "Ri-028"
+    category: "security"
+    description: >
+      In multi-agent systems where multiple AI agents communicate,
+      delegate tasks, or share state, a compromised or manipulated
+      agent propagates malicious behavior across the agent swarm by
+      exploiting implicit trust between agents. Agents in a swarm
+      frequently trust messages from other agents in the same system
+      without verification — a compromised orchestrator can instruct
+      worker agents to take unauthorized actions, a poisoned worker
+      can inject false results into the orchestrator's reasoning,
+      and a compromised memory agent can corrupt the shared state
+      that all agents read from. In financial AI, multi-agent
+      architectures are increasingly used for complex workflows —
+      loan processing pipelines, regulatory reporting chains, fraud
+      investigation workflows — where each agent handles one step
+      of a larger process. Trust boundary violations in these systems
+      can cause cascading failures that are difficult to trace because
+      the proximate cause of each individual agent's failure appears
+      legitimate when examined in isolation. Mitigation requires
+      explicit trust declarations between agents, cryptographic
+      message signing between agent boundaries, and governance
+      checkpoints that validate agent outputs before they are
+      consumed by downstream agents.
+    severity: "blocker"
+    min_severity: "blocker"
+    runtime_pattern: '(?i)(multi-agent|swarm|delegate|orchestrator|trust boundary)'
+    min_mitigations: 1
+    detection: ~
+    primitives:
+      action: propagate
+      object: malicious_behavior
+      context: swarm_implicit_trust
+      authority: compromised_agent
+      flow: cascading_failure

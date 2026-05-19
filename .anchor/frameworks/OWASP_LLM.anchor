@@ -1,0 +1,86 @@
+type: framework
+namespace: OWASP
+version: "2025"
+anchor_version: ">=4.0.0"
+maintainer: "Anchor Core"
+source: "OWASP Top 10 for Large Language Model Applications"
+source_url: "https://owasp.org/www-project-top-10-for-large-language-model-applications/"
+credit: "OWASP Foundation"
+description: >
+  The OWASP Top 10 for LLMs provides a list of the most critical
+  security risks for applications utilizing Large Language Models.
+  This framework file maps OWASP LLM-specific risks to the
+  canonical Anchor V4 Domain rules.
+seal: "sha256:PENDING"
+
+rules:
+
+  - id: "OWASP-001"
+    name: "LLM01: Prompt Injection"
+    original_id: "LLM-01"
+    maps_to: "SEC-001"
+    severity: "blocker"
+    description: "Malicious instructions injected into prompts to manipulate LLM behavior."
+
+  - id: "OWASP-002"
+    name: "LLM02: Insecure Output Handling"
+    original_id: "LLM-02"
+    maps_to: "SEC-007"
+    severity: "blocker"
+    description: "Failure to sanitize LLM outputs before passing them to sensitive downstream functions (e.g. shell)."
+
+  - id: "OWASP-003"
+    name: "LLM03: Training Data Poisoning"
+    original_id: "LLM-03"
+    maps_to: "SEC-002"
+    severity: "blocker"
+    description: "Poisoning training data to create backdoors or bias in LLM behavior."
+
+  - id: "OWASP-004"
+    name: "LLM04: Model Denial of Service"
+    original_id: "LLM-04"
+    maps_to: "OPS-001"
+    severity: "error"
+    description: "Causing excessive resource consumption in LLMs to degrade availability."
+
+  - id: "OWASP-005"
+    name: "LLM05: Supply Chain Vulnerabilities"
+    original_id: "LLM-05"
+    maps_to: "SEC-008"
+    severity: "blocker"
+    description: "Risks from compromised third-party components, data, or models."
+
+  - id: "OWASP-006"
+    name: "LLM06: Sensitive Information Disclosure"
+    original_id: "LLM-06"
+    maps_to: "PRV-001"
+    severity: "blocker"
+    description: "LLM leaking PII or other sensitive data in its responses."
+
+  - id: "OWASP-007"
+    name: "LLM07: Insecure Plugin Design"
+    original_id: "LLM-07"
+    maps_to: "AGT-001"
+    severity: "blocker"
+    description: "Plugins/tools with insufficient access controls callable by the LLM."
+
+  - id: "OWASP-008"
+    name: "LLM08: Excessive Agency"
+    original_id: "LLM-08"
+    maps_to: "AGT-005"
+    severity: "blocker"
+    description: "LLM having broad permissions or functioning without adequate human oversight."
+
+  - id: "OWASP-009"
+    name: "LLM09: Overreliance"
+    original_id: "LLM-09"
+    maps_to: "ALN-001"
+    severity: "error"
+    description: "Dependence on LLM outputs without verification, increasing risk from hallucinations."
+
+  - id: "OWASP-010"
+    name: "LLM10: Model Theft"
+    original_id: "LLM-10"
+    maps_to: "SUP-001"
+    severity: "blocker"
+    description: "Unauthorized access, copying, or extraction of proprietary models."
